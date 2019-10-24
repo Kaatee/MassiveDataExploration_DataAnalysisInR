@@ -6,52 +6,83 @@ output:
 ---
 data wygenerowania: '`r format(Sys.Date(), "%Y-%B-%d")`'
 
-# Spis treści
-1. [Podsumowanie badań](#summary)
-2. [Wykorzystane biblioteki](#librarys)
-3. [XXX](#xxx)
-4. [Wczytywanie danych z pliku](#readDataFromFile)
-5. [Brakujące dane](#missingData) 
-6. [Rozmiar zbioru i statystyki](#statistics)
-7. [Szczegółowa analiza zbiorów wartości](#analisis)
-8. [Korelacja między zmiennymi](#correlation)
-9. [Zmiana rozmiaru śledzia w czasie](#animation)
-10. [Przewidywanie rozmiaru śledzia](#prediction)
-11. [Analiza ważnośći atrybutów najlepszego znalezionego modelu regresji](#bestModelAnalisis)
+# Podsumowanie badań
+//TODO podsumowanie calego raportu
 
-## Podsumowanie badań <a name="summary"></a>
-TODO: rozdział podsumowujący całą analizę
+# Wykorzystane biblioteki
+//TODO Kod wyliczający wykorzystane biblioteki.
+library(plotly)
 
-## Wykorzystane biblioteki <a name="librarys"></a>
-Kod wyliczający wykorzystane biblioteki.
-
-## XXX <a name="xxx"></a>
-Kod zapewniający powtarzalność wyników przy każdym uruchomieniu raportu na tych samych danych.
-
-## Wczytywanie danych z pliku <a name="readDataFromFile"></a>
+# Zapewnienie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych
 ```{r}
-data <- read.table("sledzie.csv", header=TRUE, sep=",")
+set.seed(23)
+```
+
+# Wczytywanie danych z pliku
+```{r}
+names <- read.table("sledzie.csv", nrow=1, stringsAsFactors = FALSE, sep = ",")
+data <- read.table("sledzie.csv", header=TRUE,, stringsAsFactors = FALSE, sep=",")
 head(data)
+
+sapply(data, class)
+```
+Zmiana "?" na "NA" wraz ze zmianą typu danych z character na numeric:
+```{r}
+data[data=="?"] <- NA
+
+data$cfin1 <- as.numeric(data$cfin1)
+data$cfin2 <- as.numeric(data$cfin2)
+data$chel1 <- as.numeric(data$chel1)
+data$chel2 <- as.numeric(data$chel2)
+data$lcop1 <- as.numeric(data$lcop1)
+data$lcop2 <- as.numeric(data$lcop2)
+data$sst <- as.numeric(data$sst)
+
+head(data)
+sapply(data, class)
+
 ```
 
 
-## Brakujące dane <a name="missingData"></a>
-Kod przetwarzający brakujące dane.
+# Brakujące dane
+//TODO Kod przetwarzający brakujące dane.
 
-## Rozmiar zbioru i statystyki <a name="statistics"></a>
+# Rozmiar zbioru i statystyki
 Sekcja podsumowująca rozmiar zbioru i podstawowe statystyki.
+```{r}
+paste("Wczytane dane zawierają ", nrow(data), " rekordów oraz ", ncol(data), " kolumn.", sep=" ")
+```
 
-## Szczegółowa analiza zbiorów wartości <a name="analisis"></a>
-Szczegółowa analiza wartości atrybutów (np. poprzez prezentację rozkładów wartości).
+Podsumowanie wartości danych:
+```{r}
+summary(data)
+```
 
-## Korelacja między zmiennymi <a name="correlation"></a>
-Sekcja sprawdzająca korelacje między zmiennymi; sekcja ta powinna zawierać jakąś formę graficznej prezentacji korelacji.
+Ilość brakujących danych dla poszczególnych kolumn:
+```{r}
+missingData <- sapply(data, function(x) sum(is.na(x)))
+missingData
+```
+Wykres ilości brakujących danych w zbiorze:
 
-## Zmiana rozmiaru śledzia w czasie <a name="animation"></a>
-Interaktywny wykres lub animację prezentującą zmianę rozmiaru śledzi w czasie.
+```{r}
+library(plotly)
+packageVersion('plotly')
 
-## Przewidywanie rozmiaru śledzia <a name="prediction"></a>
-Sekcję próbującą stworzyć regresor przewidujący rozmiar śledzia (w tej sekcji należy wykorzystać wiedzę z pozostałych punktów oraz wykonać dodatkowe czynności, które mogą poprawić trafność predykcji); dobór parametrów modelu oraz oszacowanie jego skuteczności powinny zostać wykonane za pomocą techniki podziału zbioru na dane uczące, walidujące i testowe; trafność regresji powinna zostać oszacowana na podstawie miar R2 i RMSE.
+plot(x = factor(names(missingData)), y = missingData, main="Wykres ilości brakujących danych w zbiorze", xlab="atrybut", ylab = "ilość brakujących artybutów")
+```
 
-## Analiza ważnośći atrybutów najlepszego znalezionego modelu regresji <a name="bestModelAnalisis"></a>
-Analiza ważności atrybutów najlepszego znalezionego modelu regresji. Analiza ważności atrybutów powinna stanowić próbę odpowiedzi na pytanie: co sprawia, że rozmiar śledzi zaczął w pewnym momencie maleć.
+# Szczegółowa analiza zbiorów wartości
+//TODO Szczegółowa analiza wartości atrybutów (np. poprzez prezentację rozkładów wartości).
+
+# Korelacja między zmiennymi
+//TODO Sekcja sprawdzająca korelacje między zmiennymi; sekcja ta powinna zawierać jakąś formę graficznej prezentacji korelacji.
+
+# Zmiana rozmiaru śledzia w czasie
+//TODO Interaktywny wykres lub animację prezentującą zmianę rozmiaru śledzi w czasie.
+
+# Przewidywanie rozmiaru śledzia
+//TODO Sekcję próbującą stworzyć regresor przewidujący rozmiar śledzia (w tej sekcji należy wykorzystać wiedzę z pozostałych punktów oraz wykonać dodatkowe czynności, które mogą poprawić trafność predykcji); dobór parametrów modelu oraz oszacowanie jego skuteczności powinny zostać wykonane za pomocą techniki podziału zbioru na dane uczące, walidujące i testowe; trafność regresji powinna zostać oszacowana na podstawie miar R2 i RMSE.
+
+# Analiza ważnośći atrybutów najlepszego znalezionego modelu regresji
+//TODO Analiza ważności atrybutów najlepszego znalezionego modelu regresji. Analiza ważności atrybutów powinna stanowić próbę odpowiedzi na pytanie: co sprawia, że rozmiar śledzi zaczął w pewnym momencie maleć.
