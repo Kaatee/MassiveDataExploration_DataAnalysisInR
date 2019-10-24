@@ -1,6 +1,6 @@
 //TODO: wstawić datę wygenerowania
 
-###Autorzy:
+### Autorzy:
 Katarzyna Jóźwiak, 127237, ITI
 Piotr Pawlaczyk, 127245, ITI
 
