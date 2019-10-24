@@ -1,17 +1,22 @@
-Data wygenerowania: `r format(Sys.Date(), "%B %e, %Y")`
+//TODO: wstawić datę wygenerowania
+
+###Autorzy:
+Katarzyna Jóźwiak, 127237, ITI
+Piotr Pawlaczyk, 127245, ITI
+
 
 # Spis treści
 1. [Podsumowanie badań](#summary)
-2. [Wykorzystane biblioteki] (#librarys) 
+2. [Wykorzystane biblioteki](#librarys)
 3. [XXX](#xxx)
-4. [Wczytywanie danych z pliku] (#readDataFromFile)
-5. [Brakujące dane] (#missingData) 
-6. [Rozmiar zbioru i statystyki] (#statistics)
-7. [Szczegółowa analiza zbiorów wartości] (#analisis)
-8. [Korelacja między zmiennymi] (#correlation)
-9. [Zmiana rozmiaru śledzia w czasie] (#animation)
-10. [Przewidywanie rozmiaru śledzia] (#prediction)
-11. [Analiza ważnośći atrybutów najlepszego znalezionego modelu regresji] (#bestModelAnalisis)
+4. [Wczytywanie danych z pliku](#readDataFromFile)
+5. [Brakujące dane](#missingData) 
+6. [Rozmiar zbioru i statystyki](#statistics)
+7. [Szczegółowa analiza zbiorów wartości](#analisis)
+8. [Korelacja między zmiennymi](#correlation)
+9. [Zmiana rozmiaru śledzia w czasie](#animation)
+10. [Przewidywanie rozmiaru śledzia](#prediction)
+11. [Analiza ważnośći atrybutów najlepszego znalezionego modelu regresji](#bestModelAnalisis)
 
 ## Podsumowanie badań <a name="summary"></a>
 TODO: rozdział podsumowujący całą analizę
