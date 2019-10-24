@@ -1,8 +1,8 @@
 ---
-title: Eksploracja Masywnych Danych - projekt 1 - Analiza danych
-author: Katarzyna Jóźwiak 127237, Piotr Pawlaczyk 127245
+title: "Eksploracja Masywnych Danych - projekt 1 - Analiza danych"
+author: "Katarzyna Jóźwiak 127237, Piotr Pawlaczyk 127245"
 output:
-  html_document: default
+  md_document: default
 ---
 data wygenerowania: '`r format(Sys.Date(), "%Y-%B-%d")`'
 
