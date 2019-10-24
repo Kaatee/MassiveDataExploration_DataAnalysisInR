@@ -1,9 +1,10 @@
-//TODO: wstawić datę wygenerowania
-
-### Autorzy:
-Katarzyna Jóźwiak, 127237, ITI  
-Piotr Pawlaczyk, 127245, ITI
-
+---
+title: Eksploracja Masywnych Danych - projekt 1 - Analiza danych
+author: Katarzyna Jóźwiak 127237, Piotr Pawlaczyk 127245
+output:
+  html_document: default
+---
+data wygenerowania: '`r format(Sys.Date(), "%Y-%B-%d")`'
 
 # Spis treści
 1. [Podsumowanie badań](#summary)
@@ -28,7 +29,11 @@ Kod wyliczający wykorzystane biblioteki.
 Kod zapewniający powtarzalność wyników przy każdym uruchomieniu raportu na tych samych danych.
 
 ## Wczytywanie danych z pliku <a name="readDataFromFile"></a>
-Wczytywanie danych z pliku
+```{r}
+data <- read.table("sledzie.csv", header=TRUE, sep=",")
+head(data)
+```
+
 
 ## Brakujące dane <a name="missingData"></a>
 Kod przetwarzający brakujące dane.
