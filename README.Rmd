@@ -2,7 +2,9 @@
 title: "Eksploracja Masywnych Danych - projekt 1 - Analiza danych"
 author: "Katarzyna Jóźwiak 127237, Piotr Pawlaczyk 127245"
 output:
-  md_document: default
+  md_document: 
+   toc: true
+   #theme: united
 ---
 data wygenerowania: '`r format(Sys.Date(), "%Y-%B-%d")`'
 
@@ -11,7 +13,8 @@ data wygenerowania: '`r format(Sys.Date(), "%Y-%B-%d")`'
 
 # Wykorzystane biblioteki
 //TODO Kod wyliczający wykorzystane biblioteki.
-library(plotly)
+library(datasets)
+library(corrplot)
 
 # Zapewnienie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych
 ```{r}
@@ -43,10 +46,6 @@ sapply(data, class)
 
 ```
 
-
-# Brakujące dane
-//TODO Kod przetwarzający brakujące dane.
-
 # Rozmiar zbioru i statystyki
 Sekcja podsumowująca rozmiar zbioru i podstawowe statystyki.
 ```{r}
@@ -62,21 +61,41 @@ Ilość brakujących danych dla poszczególnych kolumn:
 ```{r}
 missingData <- sapply(data, function(x) sum(is.na(x)))
 missingData
+class(missingData)
 ```
 Wykres ilości brakujących danych w zbiorze:
 
 ```{r}
-library(plotly)
-packageVersion('plotly')
-
+knitr::opts_chunk$set(fig.width=12, fig.height=8) 
 plot(x = factor(names(missingData)), y = missingData, main="Wykres ilości brakujących danych w zbiorze", xlab="atrybut", ylab = "ilość brakujących artybutów")
 ```
+
+
+# Brakujące dane
+//TODO Kod przetwarzający brakujące dane.
 
 # Szczegółowa analiza zbiorów wartości
 //TODO Szczegółowa analiza wartości atrybutów (np. poprzez prezentację rozkładów wartości).
 
+
 # Korelacja między zmiennymi
 //TODO Sekcja sprawdzająca korelacje między zmiennymi; sekcja ta powinna zawierać jakąś formę graficznej prezentacji korelacji.
+```{r cache=TRUE}
+plot(data[,c(1:4)])
+plot(data[,c(5:8)])
+plot(data[,c(9:12)])
+plot(data[,c(13:16)])
+```
+
+```{r}
+res <- cor(na.omit(data)) #TODO - ogarnac brakujace wartosci w danych 
+round(res, 2)
+
+library(corrplot)
+corrplot(res, type = "upper", tl.col = "black", tl.srt = 45)
+```
+
+
 
 # Zmiana rozmiaru śledzia w czasie
 //TODO Interaktywny wykres lub animację prezentującą zmianę rozmiaru śledzi w czasie.

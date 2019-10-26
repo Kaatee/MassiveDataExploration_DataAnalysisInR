@@ -1,4 +1,21 @@
-data wygenerowania: ‘2019-październik-24’
+-   [Podsumowanie badań](#podsumowanie-badań)
+-   [Wykorzystane biblioteki](#wykorzystane-biblioteki)
+-   [Zapewnienie powtarzalności wyników przy każdym uruchomieniu raportu
+    na tych samych
+    danych](#zapewnienie-powtarzalności-wyników-przy-każdym-uruchomieniu-raportu-na-tych-samych-danych)
+-   [Wczytywanie danych z pliku](#wczytywanie-danych-z-pliku)
+-   [Rozmiar zbioru i statystyki](#rozmiar-zbioru-i-statystyki)
+-   [Brakujące dane](#brakujące-dane)
+-   [Szczegółowa analiza zbiorów
+    wartości](#szczegółowa-analiza-zbiorów-wartości)
+-   [Korelacja między zmiennymi](#korelacja-między-zmiennymi)
+-   [Zmiana rozmiaru śledzia w
+    czasie](#zmiana-rozmiaru-śledzia-w-czasie)
+-   [Przewidywanie rozmiaru śledzia](#przewidywanie-rozmiaru-śledzia)
+-   [Analiza ważnośći atrybutów najlepszego znalezionego modelu
+    regresji](#analiza-ważnośći-atrybutów-najlepszego-znalezionego-modelu-regresji)
+
+data wygenerowania: ‘2019-październik-26’
 
 Podsumowanie badań
 ==================
@@ -8,7 +25,8 @@ Podsumowanie badań
 Wykorzystane biblioteki
 =======================
 
-//TODO Kod wyliczający wykorzystane biblioteki. library(plotly)
+//TODO Kod wyliczający wykorzystane biblioteki. library(datasets)
+library(corrplot)
 
 Zapewnienie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych
 =========================================================================================
@@ -84,11 +102,6 @@ Zmiana “?” na “NA” wraz ze zmianą typu danych z character na numeric:
     ##    xmonth       nao 
     ## "integer" "numeric"
 
-Brakujące dane
-==============
-
-//TODO Kod przetwarzający brakujące dane.
-
 Rozmiar zbioru i statystyki
 ===========================
 
@@ -145,34 +158,21 @@ Ilość brakujących danych dla poszczególnych kolumn:
     ##   cumf totaln    sst    sal xmonth    nao 
     ##      0      0   1584      0      0      0
 
+    class(missingData)
+
+    ## [1] "integer"
+
 Wykres ilości brakujących danych w zbiorze:
 
-    library(plotly)
-
-    ## Loading required package: ggplot2
-
-    ## 
-    ## Attaching package: 'plotly'
-
-    ## The following object is masked from 'package:ggplot2':
-    ## 
-    ##     last_plot
-
-    ## The following object is masked from 'package:stats':
-    ## 
-    ##     filter
-
-    ## The following object is masked from 'package:graphics':
-    ## 
-    ##     layout
-
-    packageVersion('plotly')
-
-    ## [1] '4.9.0'
-
+    knitr::opts_chunk$set(fig.width=12, fig.height=8) 
     plot(x = factor(names(missingData)), y = missingData, main="Wykres ilości brakujących danych w zbiorze", xlab="atrybut", ylab = "ilość brakujących artybutów")
 
 ![](README_files/figure-markdown_strict/unnamed-chunk-7-1.png)
+
+Brakujące dane
+==============
+
+//TODO Kod przetwarzający brakujące dane.
 
 Szczegółowa analiza zbiorów wartości
 ====================================
@@ -185,6 +185,68 @@ Korelacja między zmiennymi
 
 //TODO Sekcja sprawdzająca korelacje między zmiennymi; sekcja ta powinna
 zawierać jakąś formę graficznej prezentacji korelacji.
+
+    plot(data[,c(1:4)])
+
+![](README_files/figure-markdown_strict/unnamed-chunk-8-1.png)
+
+    plot(data[,c(5:8)])
+
+![](README_files/figure-markdown_strict/unnamed-chunk-8-2.png)
+
+    plot(data[,c(9:12)])
+
+![](README_files/figure-markdown_strict/unnamed-chunk-8-3.png)
+
+    plot(data[,c(13:16)])
+
+![](README_files/figure-markdown_strict/unnamed-chunk-8-4.png)
+
+    res <- cor(na.omit(data)) #TODO - ogarnac brakujace wartosci w danych 
+    round(res, 2)
+
+    ##            X length cfin1 cfin2 chel1 chel2 lcop1 lcop2  fbar  recr  cumf
+    ## X       1.00  -0.34 -0.15  0.06 -0.17  0.05 -0.23  0.04  0.09  0.00  0.23
+    ## length -0.34   1.00  0.08  0.10  0.22 -0.01  0.24  0.05  0.26 -0.01  0.01
+    ## cfin1  -0.15   0.08  1.00  0.15  0.10  0.20  0.12  0.21 -0.06  0.12 -0.05
+    ## cfin2   0.06   0.10  0.15  1.00  0.00  0.31 -0.04  0.65  0.15 -0.10  0.34
+    ## chel1  -0.17   0.22  0.10  0.00  1.00  0.29  0.96  0.25  0.16 -0.05  0.07
+    ## chel2   0.05  -0.01  0.20  0.31  0.29  1.00  0.17  0.89  0.03  0.00  0.26
+    ## lcop1  -0.23   0.24  0.12 -0.04  0.96  0.17  1.00  0.15  0.09  0.01 -0.01
+    ## lcop2   0.04   0.05  0.21  0.65  0.25  0.89  0.15  1.00  0.05  0.00  0.29
+    ## fbar    0.09   0.26 -0.06  0.15  0.16  0.03  0.09  0.05  1.00 -0.24  0.82
+    ## recr    0.00  -0.01  0.12 -0.10 -0.05  0.00  0.01  0.00 -0.24  1.00 -0.26
+    ## cumf    0.23   0.01 -0.05  0.34  0.07  0.26 -0.01  0.29  0.82 -0.26  1.00
+    ## totaln -0.36   0.10  0.13 -0.22  0.17 -0.38  0.27 -0.30 -0.51  0.37 -0.71
+    ## sst     0.36  -0.45  0.01 -0.24 -0.22  0.01 -0.27 -0.12 -0.18 -0.20  0.03
+    ## sal    -0.06   0.03  0.13 -0.08 -0.15 -0.22 -0.10 -0.19  0.04  0.28 -0.10
+    ## xmonth  0.00   0.01  0.01  0.02  0.05  0.07  0.03  0.06  0.01  0.02  0.04
+    ## nao     0.41  -0.26  0.01 -0.01 -0.51 -0.06 -0.55 -0.04  0.07  0.09  0.23
+    ##        totaln   sst   sal xmonth   nao
+    ## X       -0.36  0.36 -0.06   0.00  0.41
+    ## length   0.10 -0.45  0.03   0.01 -0.26
+    ## cfin1    0.13  0.01  0.13   0.01  0.01
+    ## cfin2   -0.22 -0.24 -0.08   0.02 -0.01
+    ## chel1    0.17 -0.22 -0.15   0.05 -0.51
+    ## chel2   -0.38  0.01 -0.22   0.07 -0.06
+    ## lcop1    0.27 -0.27 -0.10   0.03 -0.55
+    ## lcop2   -0.30 -0.12 -0.19   0.06 -0.04
+    ## fbar    -0.51 -0.18  0.04   0.01  0.07
+    ## recr     0.37 -0.20  0.28   0.02  0.09
+    ## cumf    -0.71  0.03 -0.10   0.04  0.23
+    ## totaln   1.00 -0.29  0.15  -0.03 -0.39
+    ## sst     -0.29  1.00  0.01  -0.01  0.51
+    ## sal      0.15  0.01  1.00  -0.03  0.12
+    ## xmonth  -0.03 -0.01 -0.03   1.00  0.00
+    ## nao     -0.39  0.51  0.12   0.00  1.00
+
+    library(corrplot)
+
+    ## corrplot 0.84 loaded
+
+    corrplot(res, type = "upper", tl.col = "black", tl.srt = 45)
+
+![](README_files/figure-markdown_strict/unnamed-chunk-9-1.png)
 
 Zmiana rozmiaru śledzia w czasie
 ================================
