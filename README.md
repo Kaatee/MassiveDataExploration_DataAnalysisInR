@@ -3,6 +3,7 @@
 -   [Zapewnienie powtarzalności wyników przy każdym uruchomieniu raportu
     na tych samych
     danych](#zapewnienie-powtarzalności-wyników-przy-każdym-uruchomieniu-raportu-na-tych-samych-danych)
+-   [Wstęp](#wstęp)
 -   [Wczytywanie danych z pliku](#wczytywanie-danych-z-pliku)
 -   [Rozmiar zbioru i statystyki](#rozmiar-zbioru-i-statystyki)
 -   [Brakujące dane](#brakujące-dane)
@@ -32,6 +33,38 @@ Zapewnienie powtarzalności wyników przy każdym uruchomieniu raportu na tych s
 =========================================================================================
 
     set.seed(23)
+
+Wstęp
+=====
+
+W podanym sprawozdaniu użyto zbioru danych sledzie.csv pobranego ze
+strony
+<a href="http://www.cs.put.poznan.pl/alabijak/emd/projekt/sledzie.csv" class="uri">http://www.cs.put.poznan.pl/alabijak/emd/projekt/sledzie.csv</a>
+. Zbiór ten opisuje rozmiary śledzi i warunki, w których żyją od 60-ciu
+lat. Kolejne kolumny w zbiorze danych to:  
+\* **length**: długość złowionego śledzia \[cm\];  
+\* **cfin1**: dostępność planktonu \[zagęszczenie Calanus finmarchicus
+gat. 1\];  
+\* **cfin2**: dostępność planktonu \[zagęszczenie Calanus finmarchicus
+gat. 2\];  
+\* **chel1**: dostępność planktonu \[zagęszczenie Calanus helgolandicus
+gat. 1\];  
+\* **chel2**: dostępność planktonu \[zagęszczenie Calanus helgolandicus
+gat. 2\];  
+\* **lcop1**: dostępność planktonu \[zagęszczenie widłonogów gat. 1\];  
+\* **lcop2**: dostępność planktonu \[zagęszczenie widłonogów gat. 2\];  
+\* **fbar**: natężenie połowów w regionie \[ułamek pozostawionego
+narybku\];  
+\* **recr**: roczny narybek \[liczba śledzi\];  
+\* **cumf**: łączne roczne natężenie połowów w regionie \[ułamek
+pozostawionego narybku\];  
+\* **totaln**: łączna liczba ryb złowionych w ramach połowu \[liczba
+śledzi\];  
+\* **sst**: temperatura przy powierzchni wody \[°C\];  
+\* **sal**: poziom zasolenia wody \[Knudsen ppt\];  
+\* **xmonth**: miesiąc połowu \[numer miesiąca\];  
+\* **nao**: oscylacja północnoatlantycka \[mb\].  
+Wiersze w zbiorze są uporządkowane chronologicznie.
 
 Wczytywanie danych z pliku
 ==========================
@@ -248,11 +281,45 @@ zawierać jakąś formę graficznej prezentacji korelacji.
 
 ![](README_files/figure-markdown_strict/unnamed-chunk-9-1.png)
 
+//TODO opis tych tabelek
+
 Zmiana rozmiaru śledzia w czasie
 ================================
 
-//TODO Interaktywny wykres lub animację prezentującą zmianę rozmiaru
-śledzi w czasie.
+//Interaktywny wykres lub animacja prezentująca zmianę rozmiaru śledzi w
+czasie.
+
+    library(ggplot2)
+    library(gganimate)
+    library(dplyr)
+
+    ## 
+    ## Attaching package: 'dplyr'
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
+
+    #gifski package
+
+    p <- ggplot(
+      na.omit(data), #ogarnąć brakujące dane
+      aes(X, length, group = xmonth, color = factor(xmonth))
+      ) +
+      geom_line() +
+      scale_color_viridis_d() +
+      labs(x = "Kolejne połowy", y = "Dlugosc sledzia") +
+      theme(legend.position = "top")
+
+    p + geom_point() + transition_reveal(X)
+
+![](README_files/figure-markdown_strict/unnamed-chunk-11-1.gif) //TODO -
+pobawic sie w pogrupowanie tych miesiecy w pory roku zeby nie bylo tak
+brzydko na wykresie
 
 Przewidywanie rozmiaru śledzia
 ==============================

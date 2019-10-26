@@ -2,9 +2,9 @@
 title: "Eksploracja Masywnych Danych - projekt 1 - Analiza danych"
 author: "Katarzyna Jóźwiak 127237, Piotr Pawlaczyk 127245"
 output:
-  md_document: 
+  html_document: 
    toc: true
-   #theme: united
+   theme: united
 ---
 data wygenerowania: '`r format(Sys.Date(), "%Y-%B-%d")`'
 
@@ -21,6 +21,26 @@ library(corrplot)
 set.seed(23)
 ```
 
+# Wstęp
+W podanym sprawozdaniu użyto zbioru danych sledzie.csv pobranego ze strony http://www.cs.put.poznan.pl/alabijak/emd/projekt/sledzie.csv . 
+Zbiór ten opisuje rozmiary śledzi i warunki, w których żyją od 60-ciu lat. Kolejne kolumny w zbiorze danych to:  
+* **length**: długość złowionego śledzia [cm];  
+* **cfin1**: dostępność planktonu [zagęszczenie Calanus finmarchicus gat. 1];  
+* **cfin2**: dostępność planktonu [zagęszczenie Calanus finmarchicus gat. 2];  
+* **chel1**: dostępność planktonu [zagęszczenie Calanus helgolandicus gat. 1];  
+* **chel2**: dostępność planktonu [zagęszczenie Calanus helgolandicus gat. 2];  
+* **lcop1**: dostępność planktonu [zagęszczenie widłonogów gat. 1];  
+* **lcop2**: dostępność planktonu [zagęszczenie widłonogów gat. 2];  
+* **fbar**: natężenie połowów w regionie [ułamek pozostawionego narybku];  
+* **recr**: roczny narybek [liczba śledzi];  
+* **cumf**: łączne roczne natężenie połowów w regionie [ułamek pozostawionego narybku];  
+* **totaln**: łączna liczba ryb złowionych w ramach połowu [liczba śledzi];  
+* **sst**: temperatura przy powierzchni wody [°C];  
+* **sal**: poziom zasolenia wody [Knudsen ppt];  
+* **xmonth**: miesiąc połowu [numer miesiąca];  
+* **nao**: oscylacja północnoatlantycka [mb].  
+Wiersze w zbiorze są uporządkowane chronologicznie.
+
 # Wczytywanie danych z pliku
 ```{r}
 names <- read.table("sledzie.csv", nrow=1, stringsAsFactors = FALSE, sep = ",")
@@ -29,6 +49,7 @@ head(data)
 
 sapply(data, class)
 ```
+
 Zmiana "?" na "NA" wraz ze zmianą typu danych z character na numeric:
 ```{r}
 data[data=="?"] <- NA
@@ -95,10 +116,30 @@ library(corrplot)
 corrplot(res, type = "upper", tl.col = "black", tl.srt = 45)
 ```
 
-
+//TODO opis tych tabelek
 
 # Zmiana rozmiaru śledzia w czasie
-//TODO Interaktywny wykres lub animację prezentującą zmianę rozmiaru śledzi w czasie.
+//Interaktywny wykres lub animacja prezentująca zmianę rozmiaru śledzi w czasie.
+```{r}
+library(ggplot2)
+library(gganimate)
+library(dplyr)
+#gifski package
+
+p <- ggplot(
+  na.omit(data), #ogarnąć brakujące dane
+  aes(X, length, group = xmonth, color = factor(xmonth))
+  ) +
+  geom_line() +
+  scale_color_viridis_d() +
+  labs(x = "Kolejne połowy", y = "Dlugosc sledzia") +
+  theme(legend.position = "top")
+```
+
+```{r}
+p + geom_point() + transition_reveal(X)
+```
+//TODO - pobawic sie w pogrupowanie tych miesiecy w pory roku zeby nie bylo tak brzydko na wykresie
 
 # Przewidywanie rozmiaru śledzia
 //TODO Sekcję próbującą stworzyć regresor przewidujący rozmiar śledzia (w tej sekcji należy wykorzystać wiedzę z pozostałych punktów oraz wykonać dodatkowe czynności, które mogą poprawić trafność predykcji); dobór parametrów modelu oraz oszacowanie jego skuteczności powinny zostać wykonane za pomocą techniki podziału zbioru na dane uczące, walidujące i testowe; trafność regresji powinna zostać oszacowana na podstawie miar R2 i RMSE.
