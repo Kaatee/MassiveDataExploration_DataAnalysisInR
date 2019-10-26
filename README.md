@@ -33,14 +33,14 @@ wykorzystane następujące biblioteki: - datasets
 - ggplot2  
 - gganimate  
 - dplyr  
-- gridExtra
+- gridExtra - gifski package
 
 Zapewnienie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych
 =========================================================================================
 
-Aby zapewnić powtarzalność próbkowań i losowań liczb przy każdym
-odpaleniu programu ustawiono stałe ziarno.  
-***\[TODO\]*** Ogarnąć na końcu czy tego potrzebujemy
+Aby zapewnić powtarzalność próbkowań i losowań liczb (m. inn. przy
+próbkowaniu zbioru) przy każdym odpaleniu programu ustawiono stałe
+ziarno.
 
     set.seed(23)
 
@@ -314,66 +314,40 @@ Korelacja między zmiennymi
 ==========================
 
 W niniejszej sekcji została przeanalizowana korelacja między
-atrybutami.Na początek przedstawiono liczbową korelacje między
-atrybutemi wraz z jej graficzną macierzą korelacji.
+atrybutami.Na początek przedstawiono współczynniki korelacji wraz z
+graficzną macierzą korelacji.
 
 Największa korelacja występuje między atrybutem *chel1* i *lcop1* -
-czyli między dostępnością planktonu dwóch gatunków) i wynosi ona 0.96,
-między *chel2* i *lcop2* - współczynnik korelacji wynosi 0.89 a także
-między *cumf* ( łączne roczne natężenie połowów w regionie) a *fbar*
-(natężenie połowów w regionie) - wynosi 0.82 (zależność między tymi
-ostatnimi wynika z tego że na podstawie jednego z tych atrybutów w
-naturalny sposób oblicza się dtugi z nich).
+czyli między dostępnością planktonu dwóch gatunków i wynosi ona 0.96.
+Między *chel2* i *lcop2* - współczynnik korelacji wynosi 0.89, a między
+*cumf* ( łączne roczne natężenie połowów w regionie) a *fbar* (natężenie
+połowów w regionie): 0.82 (zależność między tymi ostatnimi wynika
+prawdopodobnie z tego, że na podstawie jednego z tych atrybutów w
+naturalny sposób oblicza się dtugi z nich). Wysoka korelacja występuje
+także między *cfin2* a *lcop2*, gdzie współczynnik korelacji jest równy
+0.65.
 
-Bardzo niski, jednak ujemny współczynnik korelacji miedzy atrybutem
-*lcop1* a *neo* (oscylacja północnoatlantycka) świadczy o wysokiej, ale
-odwrotnej zaleznosci tych atrybutów. Może to być wyjaśnione z punktu
-widzenia przyrody przez to, że plankton może być przenoszony przez prądy
-morskie.
+Bardzo niski, jednak ujemny współczynnik korelacji (wynoszący -0.55)
+miedzy atrybutem *lcop1* a *neo* (oscylacja północnoatlantycka) świadczy
+o wysokiej, ale odwrotnej zaleznosci tych atrybutów. Może to być
+wyjaśnione z punktu widzenia przyrody przez to, że plankton może być
+przenoszony przez prądy morskie.
 
-Długość śledzia jest najbardziej skorelowana z temperaturą przy
-powierzchni wody, a współczynnik tej korelacji wynosi -0.45 (czyli są to
-wartości odwrotnie zależne)
+Niski ujemny współczynnik korelacji wskazujący na wysoką korelacje
+atrybutów można też zauważyć między *cumf* (łączne roczne natężenie
+połowów w regionie) a *totaln* (łączna liczba ryb złowionych w ramach
+połowu) - wynosi on -0.71, gdzie taka zależność też jest naturalna.
 
-***\[TODO\]*** Ogarnąć brakujące wartości
+Jeśli chodzi o atrybut, którego będą dotyczyć badania w dalszej części
+pracy, czyli ługość śledzia, to jest najbardziej skorelowana z
+temperaturą przy powierzchni wody, a współczynnik tej korelacji wynosi
+-0.45 (czyli są to wartości odwrotnie zależne)
+
+***\[TODO\]*** Ogarnąć brakujące wartości  
+***\[TODO\]*** Zmniejszyć tekst w srodku zebybylo widac
 
     res <- cor(na.omit(data))
-    round(res, 2)
-
-    ##            X length cfin1 cfin2 chel1 chel2 lcop1 lcop2  fbar  recr  cumf
-    ## X       1.00  -0.34 -0.15  0.06 -0.17  0.05 -0.23  0.04  0.09  0.00  0.23
-    ## length -0.34   1.00  0.08  0.10  0.22 -0.01  0.24  0.05  0.26 -0.01  0.01
-    ## cfin1  -0.15   0.08  1.00  0.15  0.10  0.20  0.12  0.21 -0.06  0.12 -0.05
-    ## cfin2   0.06   0.10  0.15  1.00  0.00  0.31 -0.04  0.65  0.15 -0.10  0.34
-    ## chel1  -0.17   0.22  0.10  0.00  1.00  0.29  0.96  0.25  0.16 -0.05  0.07
-    ## chel2   0.05  -0.01  0.20  0.31  0.29  1.00  0.17  0.89  0.03  0.00  0.26
-    ## lcop1  -0.23   0.24  0.12 -0.04  0.96  0.17  1.00  0.15  0.09  0.01 -0.01
-    ## lcop2   0.04   0.05  0.21  0.65  0.25  0.89  0.15  1.00  0.05  0.00  0.29
-    ## fbar    0.09   0.26 -0.06  0.15  0.16  0.03  0.09  0.05  1.00 -0.24  0.82
-    ## recr    0.00  -0.01  0.12 -0.10 -0.05  0.00  0.01  0.00 -0.24  1.00 -0.26
-    ## cumf    0.23   0.01 -0.05  0.34  0.07  0.26 -0.01  0.29  0.82 -0.26  1.00
-    ## totaln -0.36   0.10  0.13 -0.22  0.17 -0.38  0.27 -0.30 -0.51  0.37 -0.71
-    ## sst     0.36  -0.45  0.01 -0.24 -0.22  0.01 -0.27 -0.12 -0.18 -0.20  0.03
-    ## sal    -0.06   0.03  0.13 -0.08 -0.15 -0.22 -0.10 -0.19  0.04  0.28 -0.10
-    ## xmonth  0.00   0.01  0.01  0.02  0.05  0.07  0.03  0.06  0.01  0.02  0.04
-    ## nao     0.41  -0.26  0.01 -0.01 -0.51 -0.06 -0.55 -0.04  0.07  0.09  0.23
-    ##        totaln   sst   sal xmonth   nao
-    ## X       -0.36  0.36 -0.06   0.00  0.41
-    ## length   0.10 -0.45  0.03   0.01 -0.26
-    ## cfin1    0.13  0.01  0.13   0.01  0.01
-    ## cfin2   -0.22 -0.24 -0.08   0.02 -0.01
-    ## chel1    0.17 -0.22 -0.15   0.05 -0.51
-    ## chel2   -0.38  0.01 -0.22   0.07 -0.06
-    ## lcop1    0.27 -0.27 -0.10   0.03 -0.55
-    ## lcop2   -0.30 -0.12 -0.19   0.06 -0.04
-    ## fbar    -0.51 -0.18  0.04   0.01  0.07
-    ## recr     0.37 -0.20  0.28   0.02  0.09
-    ## cumf    -0.71  0.03 -0.10   0.04  0.23
-    ## totaln   1.00 -0.29  0.15  -0.03 -0.39
-    ## sst     -0.29  1.00  0.01  -0.01  0.51
-    ## sal      0.15  0.01  1.00  -0.03  0.12
-    ## xmonth  -0.03 -0.01 -0.03   1.00  0.00
-    ## nao     -0.39  0.51  0.12   0.00  1.00
+    #round(res, 2)
 
     library(corrplot)
 
@@ -386,19 +360,48 @@ wartości odwrotnie zależne)
 Żeby lepiej zwizualizować korelacje między omówionymi atrybutami
 przedstawiono wykresy zależności tych atrybutów.
 
-    plot(data[,c(5,6,7,8,16)])
+    plot(data[,c(5,7,16)])
 
 ![](README_files/figure-markdown_strict/unnamed-chunk-12-1.png)
 
-    plot(data[,c(2,9,11,13)])
+W przypadku zaprezentowanych powyżej danych, zgodnie z wartościami
+mieszczącymi się w macierzy korelacji, największą korelacje
+(współczynnik korelacji wynoszący 0.96) widać między dostępnością
+planktonu pierwszego gatunku Calanus helgolandicus (*chel1*) a
+zagęszczeniem widłonogów z gatunku pierwszego (*lcop2*). Z wykresu
+wynika, że im więcej jednego plantonu w łowisku, tym spotkać tam można
+więcej drugiego z wymienionych planktonów.  
+Zależność między *lcop2* a oscylacja północnoatlantycka *neo* nie jest
+aż tak widoczna na wykresie (choć też da się ją zauważyć).
+
+***\[TODO\]*** o co chodzi z tymi poziomymi i pionowymi kreskami?
+
+    plot(data[,c(6,8,4)])
 
 ![](README_files/figure-markdown_strict/unnamed-chunk-13-1.png)
 
+Podobnie jak na poprzednim wykresie, i tu najbardziej widoczna jest
+korelacja między dostępnością dwóch z gatunków planktonu.
+
+    plot(data[,c(9,11,12)])
+
+![](README_files/figure-markdown_strict/unnamed-chunk-14-1.png)
+
+Na powyższym wykresie korelacji najbardziej widać odwrotnie
+proporcjonalną zależność między *fbar* a *totaln* - współczynnik
+korelacjiwynoszący -0.71) i *cumf* a *totaln*. Można wyraźnie zauważyć
+że im więcej pierwszego z atrybutów, tym mniej drugiego i odwrotnie.  
+Wysoce proporcjonalne są zmienne *fbar* i *cumf*.
+
+    plot(data[,c(2,13)])
+
+![](README_files/figure-markdown_strict/unnamed-chunk-15-1.png)
+
+***\[TODO\]*** Nie mam pojęcia jak opisać ten wykres, jak sie nie dowiem
+to wywalić :P
+
 Zmiana rozmiaru śledzia w czasie
 ================================
-
-//Interaktywny wykres lub animacja prezentująca zmianę rozmiaru śledzi w
-czasie.
 
     library(ggplot2)
     library(gganimate)
@@ -419,8 +422,6 @@ czasie.
     ## 
     ##     intersect, setdiff, setequal, union
 
-    #gifski package
-
     p <- ggplot(
       na.omit(data), #ogarnąć brakujące dane
       aes(X, length, group = xmonth, color = factor(xmonth))
@@ -432,25 +433,22 @@ czasie.
 
     p + geom_point() + transition_reveal(X)
 
-![](README_files/figure-markdown_strict/unnamed-chunk-15-1.gif) //TODO -
-ogarnac kwestie brakujacych danych //TODO - pobawic sie w pogrupowanie
-tych miesiecy w pory roku zeby nie bylo tak brzydko na wykresie
+![](README_files/figure-markdown_strict/unnamed-chunk-17-1.gif)
+***\[TODO\]*** ogarnac kwestie brakujacych danych  
+***\[TODO\]*** pobawic sie w pogrupowanie tych miesiecy w pory roku zeby
+nie bylo tak brzydko na wykresie
 
 Przewidywanie rozmiaru śledzia
 ==============================
 
-//TODO Sekcję próbującą stworzyć regresor przewidujący rozmiar śledzia
-(w tej sekcji należy wykorzystać wiedzę z pozostałych punktów oraz
-wykonać dodatkowe czynności, które mogą poprawić trafność predykcji);
-dobór parametrów modelu oraz oszacowanie jego skuteczności powinny
-zostać wykonane za pomocą techniki podziału zbioru na dane uczące,
-walidujące i testowe; trafność regresji powinna zostać oszacowana na
-podstawie miar R2 i RMSE.
+W niniejszej sekcji zostanie podjęta próba stworzenia regresora
+przewidującego rozmiar śledzia.  
+***\[TODO\]*** ogarnąć te regresory
 
 Analiza ważnośći atrybutów najlepszego znalezionego modelu regresji
 ===================================================================
 
-//TODO Analiza ważności atrybutów najlepszego znalezionego modelu
-regresji. Analiza ważności atrybutów powinna stanowić próbę odpowiedzi
-na pytanie: co sprawia, że rozmiar śledzi zaczął w pewnym momencie
-maleć.
+***\[TODO\]*** Analiza ważności atrybutów najlepszego znalezionego
+modelu regresji. Analiza ważności atrybutów powinna stanowić próbę
+odpowiedzi na pytanie: co sprawia, że rozmiar śledzi zaczął w pewnym
+momencie maleć.

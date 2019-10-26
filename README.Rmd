@@ -19,10 +19,10 @@ Do analizy danych i stworzenia raportu z tej analizy zostały wykorzystane nast�
 - gganimate  
 - dplyr  
 - gridExtra
+- gifski package
 
 # Zapewnienie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych
-Aby zapewnić powtarzalność próbkowań i losowań liczb przy każdym odpaleniu programu ustawiono stałe ziarno.  
-***[TODO]*** Ogarnąć na końcu czy tego potrzebujemy
+Aby zapewnić powtarzalność próbkowań i losowań liczb (m. inn. przy próbkowaniu zbioru) przy każdym odpaleniu programu ustawiono stałe ziarno.  
 ```{r}
 set.seed(23)
 ```
@@ -148,18 +148,22 @@ Jeśli chodzi o atrybut jakim jest dostępność planktonu (zarówno zagęszczen
 
 # Korelacja między zmiennymi
 
-W niniejszej sekcji została przeanalizowana korelacja między atrybutami.Na początek przedstawiono liczbową korelacje między atrybutemi wraz z jej graficzną macierzą korelacji.  
+W niniejszej sekcji została przeanalizowana korelacja między atrybutami.Na początek przedstawiono współczynniki korelacji wraz z graficzną macierzą korelacji.  
 
-Największa korelacja występuje między atrybutem *chel1* i *lcop1* - czyli między dostępnością planktonu dwóch gatunków) i wynosi ona 0.96, między *chel2* i *lcop2* - współczynnik korelacji wynosi 0.89 a także między *cumf* ( łączne roczne natężenie połowów w regionie) a *fbar* (natężenie połowów w regionie) - wynosi 0.82 (zależność między tymi ostatnimi wynika z tego że na podstawie jednego z tych atrybutów w naturalny sposób oblicza się dtugi z nich).  
+Największa korelacja występuje między atrybutem *chel1* i *lcop1* - czyli między dostępnością planktonu dwóch gatunków i wynosi ona 0.96. Między *chel2* i *lcop2* - współczynnik korelacji wynosi 0.89, a między *cumf* ( łączne roczne natężenie połowów w regionie) a *fbar* (natężenie połowów w regionie): 0.82 (zależność między tymi ostatnimi wynika prawdopodobnie z tego, że na podstawie jednego z tych atrybutów w naturalny sposób oblicza się dtugi z nich). Wysoka korelacja występuje także między *cfin2* a *lcop2*, gdzie współczynnik korelacji jest równy 0.65.  
 
-Bardzo niski, jednak ujemny współczynnik korelacji miedzy atrybutem *lcop1* a *neo* (oscylacja północnoatlantycka) świadczy o wysokiej, ale odwrotnej zaleznosci tych atrybutów. Może to być wyjaśnione z punktu widzenia przyrody przez to, że plankton może być przenoszony przez prądy morskie.   
+Bardzo niski, jednak ujemny współczynnik korelacji (wynoszący -0.55) miedzy atrybutem *lcop1* a *neo* (oscylacja północnoatlantycka) świadczy o wysokiej, ale odwrotnej zaleznosci tych atrybutów. Może to być wyjaśnione z punktu widzenia przyrody przez to, że plankton może być przenoszony przez prądy morskie.  
 
-Długość śledzia jest najbardziej skorelowana z temperaturą przy powierzchni wody, a współczynnik tej korelacji wynosi -0.45 (czyli są to wartości odwrotnie zależne)
+Niski ujemny współczynnik korelacji wskazujący na wysoką korelacje atrybutów można też zauważyć między *cumf* (łączne roczne natężenie połowów w regionie) a *totaln* (łączna liczba ryb złowionych w ramach połowu) - wynosi on -0.71, gdzie taka zależność też jest naturalna.  
 
-***[TODO]*** Ogarnąć brakujące wartości
+Jeśli chodzi o atrybut, którego będą dotyczyć badania w dalszej części pracy, czyli ługość śledzia, to jest najbardziej skorelowana z temperaturą przy powierzchni wody, a współczynnik tej korelacji wynosi -0.45 (czyli są to wartości odwrotnie zależne)
+
+***[TODO]*** Ogarnąć brakujące wartości  
+***[TODO]*** Zmniejszyć tekst w srodku zebybylo widac  
+
 ```{r}
 res <- cor(na.omit(data))
-round(res, 2)
+#round(res, 2)
 
 library(corrplot)
 corrplot.mixed(res, tl.col = "black", tl.srt = 45)
@@ -168,20 +172,39 @@ corrplot.mixed(res, tl.col = "black", tl.srt = 45)
 Żeby lepiej zwizualizować korelacje między omówionymi atrybutami przedstawiono wykresy zależności tych atrybutów.
 
 ```{r}
-plot(data[,c(5,6,7,8,16)])
+plot(data[,c(5,7,16)])
 ```
+
+W przypadku zaprezentowanych powyżej danych, zgodnie z wartościami mieszczącymi się w macierzy korelacji, największą korelacje (współczynnik korelacji wynoszący 0.96) widać między dostępnością planktonu pierwszego gatunku Calanus helgolandicus (*chel1*) a zagęszczeniem widłonogów z gatunku pierwszego (*lcop2*). Z wykresu wynika, że im więcej jednego plantonu w łowisku, tym spotkać tam można więcej drugiego z wymienionych planktonów.  
+Zależność między *lcop2* a  oscylacja północnoatlantycka  *neo* nie jest aż tak widoczna na wykresie (choć też da się ją zauważyć).  
+
+***[TODO]*** o co chodzi z tymi poziomymi i pionowymi kreskami?
 
 ```{r}
-plot(data[,c(2,9,11,13)])
+plot(data[,c(6,8,4)])
 ```
 
+Podobnie jak na poprzednim wykresie, i tu najbardziej widoczna jest korelacja między dostępnością dwóch z gatunków planktonu.
+
+```{r}
+plot(data[,c(9,11,12)])
+```
+
+Na powyższym wykresie korelacji najbardziej widać odwrotnie proporcjonalną zależność między *fbar* a *totaln* - współczynnik korelacjiwynoszący -0.71) i *cumf* a *totaln*. Można wyraźnie zauważyć że im więcej pierwszego z atrybutów, tym mniej drugiego i odwrotnie.  
+Wysoce proporcjonalne są zmienne *fbar* i *cumf*.
+
+```{r}
+plot(data[,c(2,13)])
+```
+
+***[TODO]*** Nie mam pojęcia jak opisać ten wykres, jak sie nie dowiem to wywalić :P
+
 # Zmiana rozmiaru śledzia w czasie
-//Interaktywny wykres lub animacja prezentująca zmianę rozmiaru śledzi w czasie.
+
 ```{r}
 library(ggplot2)
 library(gganimate)
 library(dplyr)
-#gifski package
 
 p <- ggplot(
   na.omit(data), #ogarnąć brakujące dane
@@ -196,11 +219,13 @@ p <- ggplot(
 ```{r}
 p + geom_point() + transition_reveal(X)
 ```
-//TODO - ogarnac kwestie brakujacych danych
-//TODO - pobawic sie w pogrupowanie tych miesiecy w pory roku zeby nie bylo tak brzydko na wykresie
+***[TODO]*** ogarnac kwestie brakujacych danych  
+***[TODO]*** pobawic sie w pogrupowanie tych miesiecy w pory roku zeby nie bylo tak brzydko na wykresie
 
 # Przewidywanie rozmiaru śledzia
-//TODO Sekcję próbującą stworzyć regresor przewidujący rozmiar śledzia (w tej sekcji należy wykorzystać wiedzę z pozostałych punktów oraz wykonać dodatkowe czynności, które mogą poprawić trafność predykcji); dobór parametrów modelu oraz oszacowanie jego skuteczności powinny zostać wykonane za pomocą techniki podziału zbioru na dane uczące, walidujące i testowe; trafność regresji powinna zostać oszacowana na podstawie miar R2 i RMSE.
+W niniejszej sekcji zostanie podjęta próba stworzenia regresora przewidującego rozmiar śledzia.  
+***[TODO]*** ogarnąć te regresory    
+***[TODO]*** Sekcję próbującą stworzyć regresor przewidujący rozmiar śledzia (w tej sekcji należy wykorzystać wiedzę z pozostałych punktów oraz wykonać dodatkowe czynności, które mogą poprawić trafność predykcji); dobór parametrów modelu oraz oszacowanie jego skuteczności powinny zostać wykonane za pomocą techniki podziału zbioru na dane uczące, walidujące i testowe; trafność regresji powinna zostać oszacowana na podstawie miar R2 i RMSE
 
-# Analiza ważnośći atrybutów najlepszego znalezionego modelu regresji
-//TODO Analiza ważności atrybutów najlepszego znalezionego modelu regresji. Analiza ważności atrybutów powinna stanowić próbę odpowiedzi na pytanie: co sprawia, że rozmiar śledzi zaczął w pewnym momencie maleć.
+# Analiza ważnośći atrybutów najlepszego znalezionego modelu regresji  
+***[TODO]*** Analiza ważności atrybutów najlepszego znalezionego modelu regresji. Analiza ważności atrybutów powinna stanowić próbę odpowiedzi na pytanie: co sprawia, że rozmiar śledzi zaczął w pewnym momencie maleć.
