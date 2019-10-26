@@ -2,21 +2,27 @@
 title: "Eksploracja Masywnych Danych - projekt 1 - Analiza danych"
 author: "Katarzyna Jóźwiak 127237, Piotr Pawlaczyk 127245"
 output:
-  html_document: 
+  md_document: 
    toc: true
-   theme: united
+   #theme: united
 ---
 data wygenerowania: '`r format(Sys.Date(), "%Y-%B-%d")`'
 
 # Podsumowanie badań
-//TODO podsumowanie calego raportu
+***[TODO]*** podsumowanie calego raportu
 
 # Wykorzystane biblioteki
-//TODO Kod wyliczający wykorzystane biblioteki.
-library(datasets)
-library(corrplot)
+Do analizy danych i stworzenia raportu z tej analizy zostały wykorzystane następujące biblioteki: 
+- datasets    
+- corrplot  
+- ggplot2  
+- gganimate  
+- dplyr  
+- gridExtra
 
 # Zapewnienie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych
+Aby zapewnić powtarzalność próbkowań i losowań liczb przy każdym odpaleniu programu ustawiono stałe ziarno.  
+***[TODO]*** Ogarnąć na końcu czy tego potrzebujemy
 ```{r}
 set.seed(23)
 ```
@@ -44,16 +50,22 @@ Wiersze w zbiorze są uporządkowane chronologicznie.
 # Wczytywanie danych z pliku
 ```{r}
 names <- read.table("sledzie.csv", nrow=1, stringsAsFactors = FALSE, sep = ",")
-data <- read.table("sledzie.csv", header=TRUE,, stringsAsFactors = FALSE, sep=",")
+data <- read.table("sledzie.csv", header=TRUE, stringsAsFactors = FALSE, sep=",")
 head(data)
+```
+Jak widać, wczytane dane zawierają znak "?" przy nieznanych danych.
 
+Wyświetlenie klas poszczególnych kolumn:
+```{r}
 sapply(data, class)
 ```
-
+Dane zawierające znak "?" zostały zinterpretowane jako tekst.
 Zmiana "?" na "NA" wraz ze zmianą typu danych z character na numeric:
 ```{r}
 data[data=="?"] <- NA
-
+```
+Po zmianie znaku "?" na wartość NA zmianiono typ danych kolumn z nieznanymi wartościami na wartości numeryczne.  
+```{r}
 data$cfin1 <- as.numeric(data$cfin1)
 data$cfin2 <- as.numeric(data$cfin2)
 data$chel1 <- as.numeric(data$chel1)
@@ -66,9 +78,9 @@ head(data)
 sapply(data, class)
 
 ```
+***[TODO]*** może to jakoś ładniej zrobić "as.numeric" a nie tak brzydko powtarzając kod
 
-# Rozmiar zbioru i statystyki
-Sekcja podsumowująca rozmiar zbioru i podstawowe statystyki.
+# Rozmiar zbioru danych i podstawowe statystyki
 ```{r}
 paste("Wczytane dane zawierają ", nrow(data), " rekordów oraz ", ncol(data), " kolumn.", sep=" ")
 ```
@@ -87,17 +99,43 @@ class(missingData)
 Wykres ilości brakujących danych w zbiorze:
 
 ```{r}
-knitr::opts_chunk$set(fig.width=12, fig.height=8) 
 plot(x = factor(names(missingData)), y = missingData, main="Wykres ilości brakujących danych w zbiorze", xlab="atrybut", ylab = "ilość brakujących artybutów")
 ```
-
+Jak widać zbiór danych zawiera znaczną ilość brakujących danych, co może utrudnić ich późniejszą analizę.
 
 # Brakujące dane
-//TODO Kod przetwarzający brakujące dane.
+***[TODO]*** Kod przetwarzający brakujące dane.
 
 # Szczegółowa analiza zbiorów wartości
-//TODO Szczegółowa analiza wartości atrybutów (np. poprzez prezentację rozkładów wartości).
+***[TODO]*** Szczegółowa analiza wartości atrybutów (np. poprzez prezentację rozkładów wartości).
+Poniżej przedstawiono rozkłady wszystkich wartośi w zbiorze danych     
+***[TODO]*** Ogarnąć brakujące wartości - chyba że na.omit(data) jest ok?  
+***[TODO]*** Ogarnąć żeby łądnie były osie podpisane a nie tak brzydko na sienie nachodziły  
+```{r}
+library(ggplot2)
+library(ggExtra)
 
+lengthDissPlot <- ggplot(na.omit(data), aes(x=length)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+cfin1DissPlot <- ggplot(na.omit(data), aes(x=cfin1)) + geom_histogram(binwidth=1, colour="black", fill="white",stat="count")
+cfin2DissPlot <- ggplot(na.omit(data), aes(x=cfin2)) + geom_histogram(binwidth=1, colour="black", fill="white",stat="count")
+chel1DissPlot <- ggplot(na.omit(data), aes(x=chel1)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
+chel2DissPlot <- ggplot(na.omit(data), aes(x=chel2)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
+lcop1DissPlot <- ggplot(na.omit(data), aes(x=lcop1)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
+lcop2DissPlot <- ggplot(na.omit(data), aes(x=lcop2)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
+fbarDissPlot <- ggplot(na.omit(data), aes(x=fbar)) + geom_histogram(binwidth=.05, colour="black", fill="white")
+recrDissPlot <- ggplot(na.omit(data), aes(x=recr)) + geom_histogram(binwidth=50000.0, colour="black", fill="white")
+cumfDissPlot <- ggplot(na.omit(data), aes(x=cumf)) + geom_histogram(binwidth=.02, colour="black", fill="white")
+totalnDissPlot <- ggplot(na.omit(data), aes(x=totaln)) + geom_histogram(binwidth=1000.0, colour="black", fill="white")
+sstDissPlot <- ggplot(na.omit(data), aes(x=sst)) + geom_histogram(binwidth=1.0, colour="black", fill="white",stat="count")
+salDissPlot <- ggplot(na.omit(data), aes(x=sal)) + geom_histogram(binwidth=.01, colour="black", fill="white")
+xmonthDissPlot <- ggplot(na.omit(data), aes(x=xmonth)) + geom_histogram(binwidth=1.0, colour="black", fill="white")
+naoDissPlot <- ggplot(na.omit(data), aes(x=nao)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+
+
+require(gridExtra)
+grid.arrange(lengthDissPlot,cfin1DissPlot,cfin2DissPlot ,chel1DissPlot ,chel2DissPlot,lcop1DissPlot,lcop2DissPlot ,fbarDissPlot ,
+recrDissPlot ,cumfDissPlot ,totalnDissPlot ,sstDissPlot ,salDissPlot ,xmonthDissPlot ,naoDissPlot, nrow = 5, ncol=3)
+```
 
 # Korelacja między zmiennymi
 //TODO Sekcja sprawdzająca korelacje między zmiennymi; sekcja ta powinna zawierać jakąś formę graficznej prezentacji korelacji.
@@ -139,6 +177,7 @@ p <- ggplot(
 ```{r}
 p + geom_point() + transition_reveal(X)
 ```
+//TODO - ogarnac kwestie brakujacych danych
 //TODO - pobawic sie w pogrupowanie tych miesiecy w pory roku zeby nie bylo tak brzydko na wykresie
 
 # Przewidywanie rozmiaru śledzia

@@ -5,7 +5,8 @@
     danych](#zapewnienie-powtarzalności-wyników-przy-każdym-uruchomieniu-raportu-na-tych-samych-danych)
 -   [Wstęp](#wstęp)
 -   [Wczytywanie danych z pliku](#wczytywanie-danych-z-pliku)
--   [Rozmiar zbioru i statystyki](#rozmiar-zbioru-i-statystyki)
+-   [Rozmiar zbioru danych i podstawowe
+    statystyki](#rozmiar-zbioru-danych-i-podstawowe-statystyki)
 -   [Brakujące dane](#brakujące-dane)
 -   [Szczegółowa analiza zbiorów
     wartości](#szczegółowa-analiza-zbiorów-wartości)
@@ -21,16 +22,25 @@ data wygenerowania: ‘2019-październik-26’
 Podsumowanie badań
 ==================
 
-//TODO podsumowanie calego raportu
+***\[TODO\]*** podsumowanie calego raportu
 
 Wykorzystane biblioteki
 =======================
 
-//TODO Kod wyliczający wykorzystane biblioteki. library(datasets)
-library(corrplot)
+Do analizy danych i stworzenia raportu z tej analizy zostały
+wykorzystane następujące biblioteki: - datasets  
+- corrplot  
+- ggplot2  
+- gganimate  
+- dplyr  
+- gridExtra
 
 Zapewnienie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych
 =========================================================================================
+
+Aby zapewnić powtarzalność próbkowań i losowań liczb przy każdym
+odpaleniu programu ustawiono stałe ziarno.  
+***\[TODO\]*** Ogarnąć na końcu czy tego potrzebujemy
 
     set.seed(23)
 
@@ -70,7 +80,7 @@ Wczytywanie danych z pliku
 ==========================
 
     names <- read.table("sledzie.csv", nrow=1, stringsAsFactors = FALSE, sep = ",")
-    data <- read.table("sledzie.csv", header=TRUE,, stringsAsFactors = FALSE, sep=",")
+    data <- read.table("sledzie.csv", header=TRUE, stringsAsFactors = FALSE, sep=",")
     head(data)
 
     ##   X length   cfin1   cfin2   chel1    chel2   lcop1    lcop2  fbar   recr
@@ -88,6 +98,10 @@ Wczytywanie danych z pliku
     ## 5 0.3059879 267380.8 14.3069330186 35.51234      7 2.8
     ## 6 0.3059879 267380.8 14.3069330186 35.51234      7 2.8
 
+Jak widać, wczytane dane zawierają znak “?” przy nieznanych danych.
+
+Wyświetlenie klas poszczególnych kolumn:
+
     sapply(data, class)
 
     ##           X      length       cfin1       cfin2       chel1       chel2 
@@ -97,9 +111,13 @@ Wczytywanie danych z pliku
     ##         sst         sal      xmonth         nao 
     ## "character"   "numeric"   "integer"   "numeric"
 
-Zmiana “?” na “NA” wraz ze zmianą typu danych z character na numeric:
+Dane zawierające znak “?” zostały zinterpretowane jako tekst. Zmiana “?”
+na “NA” wraz ze zmianą typu danych z character na numeric:
 
     data[data=="?"] <- NA
+
+Po zmianie znaku “?” na wartość NA zmianiono typ danych kolumn z
+nieznanymi wartościami na wartości numeryczne.
 
     data$cfin1 <- as.numeric(data$cfin1)
     data$cfin2 <- as.numeric(data$cfin2)
@@ -135,10 +153,11 @@ Zmiana “?” na “NA” wraz ze zmianą typu danych z character na numeric:
     ##    xmonth       nao 
     ## "integer" "numeric"
 
-Rozmiar zbioru i statystyki
-===========================
+***\[TODO\]*** może to jakoś ładniej zrobić “as.numeric” a nie tak
+brzydko powtarzając kod
 
-Sekcja podsumowująca rozmiar zbioru i podstawowe statystyki.
+Rozmiar zbioru danych i podstawowe statystyki
+=============================================
 
     paste("Wczytane dane zawierają ", nrow(data), " rekordów oraz ", ncol(data), " kolumn.", sep=" ")
 
@@ -197,21 +216,77 @@ Ilość brakujących danych dla poszczególnych kolumn:
 
 Wykres ilości brakujących danych w zbiorze:
 
-    knitr::opts_chunk$set(fig.width=12, fig.height=8) 
     plot(x = factor(names(missingData)), y = missingData, main="Wykres ilości brakujących danych w zbiorze", xlab="atrybut", ylab = "ilość brakujących artybutów")
 
-![](README_files/figure-markdown_strict/unnamed-chunk-7-1.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-9-1.png) Jak widać
+zbiór danych zawiera znaczną ilość brakujących danych, co może utrudnić
+ich późniejszą analizę.
 
 Brakujące dane
 ==============
 
-//TODO Kod przetwarzający brakujące dane.
+***\[TODO\]*** Kod przetwarzający brakujące dane.
 
 Szczegółowa analiza zbiorów wartości
 ====================================
 
-//TODO Szczegółowa analiza wartości atrybutów (np. poprzez prezentację
-rozkładów wartości).
+***\[TODO\]*** Szczegółowa analiza wartości atrybutów (np. poprzez
+prezentację rozkładów wartości). Poniżej przedstawiono rozkłady
+wszystkich wartośi w zbiorze danych  
+***\[TODO\]*** Ogarnąć brakujące wartości - chyba że na.omit(data) jest
+ok?  
+***\[TODO\]*** Ogarnąć żeby łądnie były osie podpisane a nie tak brzydko
+na sienie nachodziły
+
+    library(ggplot2)
+    library(ggExtra)
+
+    lengthDissPlot <- ggplot(na.omit(data), aes(x=length)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+    cfin1DissPlot <- ggplot(na.omit(data), aes(x=cfin1)) + geom_histogram(binwidth=1, colour="black", fill="white",stat="count")
+
+    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
+
+    cfin2DissPlot <- ggplot(na.omit(data), aes(x=cfin2)) + geom_histogram(binwidth=1, colour="black", fill="white",stat="count")
+
+    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
+
+    chel1DissPlot <- ggplot(na.omit(data), aes(x=chel1)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
+
+    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
+
+    chel2DissPlot <- ggplot(na.omit(data), aes(x=chel2)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
+
+    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
+
+    lcop1DissPlot <- ggplot(na.omit(data), aes(x=lcop1)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
+
+    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
+
+    lcop2DissPlot <- ggplot(na.omit(data), aes(x=lcop2)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
+
+    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
+
+    fbarDissPlot <- ggplot(na.omit(data), aes(x=fbar)) + geom_histogram(binwidth=.05, colour="black", fill="white")
+    recrDissPlot <- ggplot(na.omit(data), aes(x=recr)) + geom_histogram(binwidth=50000.0, colour="black", fill="white")
+    cumfDissPlot <- ggplot(na.omit(data), aes(x=cumf)) + geom_histogram(binwidth=.02, colour="black", fill="white")
+    totalnDissPlot <- ggplot(na.omit(data), aes(x=totaln)) + geom_histogram(binwidth=1000.0, colour="black", fill="white")
+    sstDissPlot <- ggplot(na.omit(data), aes(x=sst)) + geom_histogram(binwidth=1.0, colour="black", fill="white",stat="count")
+
+    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
+
+    salDissPlot <- ggplot(na.omit(data), aes(x=sal)) + geom_histogram(binwidth=.01, colour="black", fill="white")
+    xmonthDissPlot <- ggplot(na.omit(data), aes(x=xmonth)) + geom_histogram(binwidth=1.0, colour="black", fill="white")
+    naoDissPlot <- ggplot(na.omit(data), aes(x=nao)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+
+
+    require(gridExtra)
+
+    ## Loading required package: gridExtra
+
+    grid.arrange(lengthDissPlot,cfin1DissPlot,cfin2DissPlot ,chel1DissPlot ,chel2DissPlot,lcop1DissPlot,lcop2DissPlot ,fbarDissPlot ,
+    recrDissPlot ,cumfDissPlot ,totalnDissPlot ,sstDissPlot ,salDissPlot ,xmonthDissPlot ,naoDissPlot, nrow = 5, ncol=3)
+
+![](README_files/figure-markdown_strict/unnamed-chunk-10-1.png)
 
 Korelacja między zmiennymi
 ==========================
@@ -221,19 +296,19 @@ zawierać jakąś formę graficznej prezentacji korelacji.
 
     plot(data[,c(1:4)])
 
-![](README_files/figure-markdown_strict/unnamed-chunk-8-1.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-11-1.png)
 
     plot(data[,c(5:8)])
 
-![](README_files/figure-markdown_strict/unnamed-chunk-8-2.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-11-2.png)
 
     plot(data[,c(9:12)])
 
-![](README_files/figure-markdown_strict/unnamed-chunk-8-3.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-11-3.png)
 
     plot(data[,c(13:16)])
 
-![](README_files/figure-markdown_strict/unnamed-chunk-8-4.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-11-4.png)
 
     res <- cor(na.omit(data)) #TODO - ogarnac brakujace wartosci w danych 
     round(res, 2)
@@ -279,7 +354,7 @@ zawierać jakąś formę graficznej prezentacji korelacji.
 
     corrplot(res, type = "upper", tl.col = "black", tl.srt = 45)
 
-![](README_files/figure-markdown_strict/unnamed-chunk-9-1.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-12-1.png)
 
 //TODO opis tych tabelek
 
@@ -295,6 +370,10 @@ czasie.
 
     ## 
     ## Attaching package: 'dplyr'
+
+    ## The following object is masked from 'package:gridExtra':
+    ## 
+    ##     combine
 
     ## The following objects are masked from 'package:stats':
     ## 
@@ -317,9 +396,9 @@ czasie.
 
     p + geom_point() + transition_reveal(X)
 
-![](README_files/figure-markdown_strict/unnamed-chunk-11-1.gif) //TODO -
-pobawic sie w pogrupowanie tych miesiecy w pory roku zeby nie bylo tak
-brzydko na wykresie
+![](README_files/figure-markdown_strict/unnamed-chunk-14-1.gif) //TODO -
+ogarnac kwestie brakujacych danych //TODO - pobawic sie w pogrupowanie
+tych miesiecy w pory roku zeby nie bylo tak brzydko na wykresie
 
 Przewidywanie rozmiaru śledzia
 ==============================
