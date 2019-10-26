@@ -218,9 +218,10 @@ Wykres ilości brakujących danych w zbiorze:
 
     plot(x = factor(names(missingData)), y = missingData, main="Wykres ilości brakujących danych w zbiorze", xlab="atrybut", ylab = "ilość brakujących artybutów")
 
-![](README_files/figure-markdown_strict/unnamed-chunk-9-1.png) Jak widać
-zbiór danych zawiera znaczną ilość brakujących danych, co może utrudnić
-ich późniejszą analizę.
+![](README_files/figure-markdown_strict/unnamed-chunk-9-1.png)
+
+Jak widać zbiór danych zawiera znaczną ilość brakujących danych, co może
+utrudnić ich późniejszą analizę.
 
 Brakujące dane
 ==============
@@ -230,13 +231,12 @@ Brakujące dane
 Szczegółowa analiza zbiorów wartości
 ====================================
 
-***\[TODO\]*** Szczegółowa analiza wartości atrybutów (np. poprzez
-prezentację rozkładów wartości). Poniżej przedstawiono rozkłady
-wszystkich wartośi w zbiorze danych  
-***\[TODO\]*** Ogarnąć brakujące wartości - chyba że na.omit(data) jest
-ok?  
-***\[TODO\]*** Ogarnąć żeby łądnie były osie podpisane a nie tak brzydko
-na sienie nachodziły
+Poniżej przedstawiono rozkłady wszystkich wartośi w zbiorze danych  
+***\[TODO\]*** Ogarnąć brakujące wartości - chyba że *na.omit(data)*
+jest ok?  
+***\[TODO\]*** Zrobić te wykresy troche szersze i wyższe  
+***\[TODO\]*** Ogarnąć żeby nie wyświetlać warningów: " Warning:
+Ignoring unknown parameters: binwidth, bins, pad"
 
     library(ggplot2)
     library(ggExtra)
@@ -288,29 +288,56 @@ na sienie nachodziły
 
 ![](README_files/figure-markdown_strict/unnamed-chunk-10-1.png)
 
+Z powyższych wykresów wynika, że jeśli chodzi o rozkład poszczególnych
+atrybutów to zbiór nie jest zrównoważony.
+
+Analizując długość śledzia (*length*) można zauważyć, że ten atrybut
+przyjmuje rozkład zbliżony do rozkładu normalnego. W zbiorze danych
+znajduje się najwięcej śledzi o długości równej 25-26cm. Ze
+wcześniejszej analizy podsumowującej dane wynika także, że minimalna
+długość śledzia w zbiorze to 19cm, a maksymalna to 32.5cm. Średnia
+długość 25.3cm, a mediana to 25,5.
+
+Jeśli chodzi o atrybut jakim jest dostępność planktonu (zarówno
+zagęszczenie *Calanus finmarchicus gat. 1* jak i *Calanus finmarchicus
+gat. 2*) to można zauważyć że w zbiorze znalazło się znacznie więcej
+danych z łowisk o mniejszej dostępności planktonu omawianego gatunku.
+Minimalna dostępność pierwszego gatunku tego planktonu to 0, maksymalna
+- ok 37,67. Srednia to ok. 0,45 a mediana to ok. 0,11. Jeśli chodzi o
+drugi gatunek planktonu *Calanus finmarchicus* to jego minimalne
+zagęszczenie wynosi 0, maksymalne - ok. 19,4, średnia to ok. 2,03 a
+mediana - 0.7.
+
+***\[TODO\]*** Opisać reszte
+
 Korelacja między zmiennymi
 ==========================
 
-//TODO Sekcja sprawdzająca korelacje między zmiennymi; sekcja ta powinna
-zawierać jakąś formę graficznej prezentacji korelacji.
+W niniejszej sekcji została przeanalizowana korelacja między
+atrybutami.Na początek przedstawiono liczbową korelacje między
+atrybutemi wraz z jej graficzną macierzą korelacji.
 
-    plot(data[,c(1:4)])
+Największa korelacja występuje między atrybutem *chel1* i *lcop1* -
+czyli między dostępnością planktonu dwóch gatunków) i wynosi ona 0.96,
+między *chel2* i *lcop2* - współczynnik korelacji wynosi 0.89 a także
+między *cumf* ( łączne roczne natężenie połowów w regionie) a *fbar*
+(natężenie połowów w regionie) - wynosi 0.82 (zależność między tymi
+ostatnimi wynika z tego że na podstawie jednego z tych atrybutów w
+naturalny sposób oblicza się dtugi z nich).
 
-![](README_files/figure-markdown_strict/unnamed-chunk-11-1.png)
+Bardzo niski, jednak ujemny współczynnik korelacji miedzy atrybutem
+*lcop1* a *neo* (oscylacja północnoatlantycka) świadczy o wysokiej, ale
+odwrotnej zaleznosci tych atrybutów. Może to być wyjaśnione z punktu
+widzenia przyrody przez to, że plankton może być przenoszony przez prądy
+morskie.
 
-    plot(data[,c(5:8)])
+Długość śledzia jest najbardziej skorelowana z temperaturą przy
+powierzchni wody, a współczynnik tej korelacji wynosi -0.45 (czyli są to
+wartości odwrotnie zależne)
 
-![](README_files/figure-markdown_strict/unnamed-chunk-11-2.png)
+***\[TODO\]*** Ogarnąć brakujące wartości
 
-    plot(data[,c(9:12)])
-
-![](README_files/figure-markdown_strict/unnamed-chunk-11-3.png)
-
-    plot(data[,c(13:16)])
-
-![](README_files/figure-markdown_strict/unnamed-chunk-11-4.png)
-
-    res <- cor(na.omit(data)) #TODO - ogarnac brakujace wartosci w danych 
+    res <- cor(na.omit(data))
     round(res, 2)
 
     ##            X length cfin1 cfin2 chel1 chel2 lcop1 lcop2  fbar  recr  cumf
@@ -352,11 +379,20 @@ zawierać jakąś formę graficznej prezentacji korelacji.
 
     ## corrplot 0.84 loaded
 
-    corrplot(res, type = "upper", tl.col = "black", tl.srt = 45)
+    corrplot.mixed(res, tl.col = "black", tl.srt = 45)
+
+![](README_files/figure-markdown_strict/unnamed-chunk-11-1.png)
+
+Żeby lepiej zwizualizować korelacje między omówionymi atrybutami
+przedstawiono wykresy zależności tych atrybutów.
+
+    plot(data[,c(5,6,7,8,16)])
 
 ![](README_files/figure-markdown_strict/unnamed-chunk-12-1.png)
 
-//TODO opis tych tabelek
+    plot(data[,c(2,9,11,13)])
+
+![](README_files/figure-markdown_strict/unnamed-chunk-13-1.png)
 
 Zmiana rozmiaru śledzia w czasie
 ================================
@@ -396,7 +432,7 @@ czasie.
 
     p + geom_point() + transition_reveal(X)
 
-![](README_files/figure-markdown_strict/unnamed-chunk-14-1.gif) //TODO -
+![](README_files/figure-markdown_strict/unnamed-chunk-15-1.gif) //TODO -
 ogarnac kwestie brakujacych danych //TODO - pobawic sie w pogrupowanie
 tych miesiecy w pory roku zeby nie bylo tak brzydko na wykresie
 
