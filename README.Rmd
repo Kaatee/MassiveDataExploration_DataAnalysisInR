@@ -18,7 +18,7 @@ Do analizy danych i stworzenia raportu z tej analizy zostały wykorzystane nast�
 - ggplot2  
 - gganimate  
 - dplyr  
-- gridExtra
+- gridExtra  
 - gifski package
 
 # Zapewnienie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych
@@ -112,7 +112,7 @@ Poniżej przedstawiono rozkłady wszystkich wartośi w zbiorze danych
 ***[TODO]*** Ogarnąć brakujące wartości - chyba że *na.omit(data)* jest ok?  
 ***[TODO]*** Zrobić te wykresy troche szersze i wyższe  
 ***[TODO]*** Ogarnąć żeby nie wyświetlać warningów: " Warning: Ignoring unknown parameters: binwidth, bins, pad"
-```{r}
+```{r cache=TRUE}
 library(ggplot2)
 library(ggExtra)
 
@@ -142,7 +142,7 @@ Z powyższych wykresów wynika, że jeśli chodzi o rozkład poszczególnych atr
 
 Analizując długość śledzia (*length*) można zauważyć, że ten atrybut przyjmuje rozkład zbliżony do rozkładu normalnego. W zbiorze danych znajduje się najwięcej śledzi o długości równej 25-26cm. Ze wcześniejszej analizy podsumowującej dane wynika także, że minimalna długość śledzia w zbiorze to 19cm, a maksymalna to 32.5cm. Średnia długość 25.3cm, a mediana to 25,5.  
 
-Jeśli chodzi o atrybut jakim jest dostępność planktonu (zarówno zagęszczenie *Calanus finmarchicus gat. 1* jak i *Calanus finmarchicus gat. 2*) to można zauważyć że w zbiorze znalazło się znacznie więcej danych z łowisk o mniejszej dostępności planktonu omawianego gatunku. Minimalna dostępność pierwszego gatunku tego planktonu to 0, maksymalna - ok 37,67. Srednia to ok. 0,45 a mediana to ok. 0,11. Jeśli chodzi o drugi gatunek planktonu *Calanus finmarchicus* to jego minimalne zagęszczenie wynosi 0, maksymalne - ok. 19,4, średnia to ok. 2,03 a mediana - 0.7.  
+Jeśli chodzi o atrybut jakim jest dostępność planktonu (zarówno zagęszczenie *Calanus finmarchicus gat. 1* jak i *Calanus finmarchicus gat. 2*) to można zauważyć że w zbiorze znalazło się znacznie więcej danych z łowisk o mniejszej dostępności planktonu omawianego gatunku. Minimalna dostępność pierwszego gatunku tego planktonu to 0, maksymalna: ok 37,67. Srednia to ok. 0,45 a mediana to ok. 0,11. Jeśli chodzi o drugi gatunek planktonu *Calanus finmarchicus* to jego minimalne zagęszczenie wynosi 0, maksymalne - ok. 19,4, średnia to ok. 2,03 a mediana - 0.7.  
 
 ***[TODO]*** Opisać reszte
 
@@ -159,9 +159,9 @@ Niski ujemny współczynnik korelacji wskazujący na wysoką korelacje atrybutó
 Jeśli chodzi o atrybut, którego będą dotyczyć badania w dalszej części pracy, czyli ługość śledzia, to jest najbardziej skorelowana z temperaturą przy powierzchni wody, a współczynnik tej korelacji wynosi -0.45 (czyli są to wartości odwrotnie zależne)
 
 ***[TODO]*** Ogarnąć brakujące wartości  
-***[TODO]*** Zmniejszyć tekst w srodku zebybylo widac  
+***[TODO]*** Zmniejszyć tekst w srodku zeby bylo widac  
 
-```{r}
+```{r cache=TRUE}
 res <- cor(na.omit(data))
 #round(res, 2)
 
@@ -171,7 +171,7 @@ corrplot.mixed(res, tl.col = "black", tl.srt = 45)
 
 Żeby lepiej zwizualizować korelacje między omówionymi atrybutami przedstawiono wykresy zależności tych atrybutów.
 
-```{r}
+```{r cache=TRUE}
 plot(data[,c(5,7,16)])
 ```
 
@@ -180,20 +180,20 @@ Zależność między *lcop2* a  oscylacja północnoatlantycka  *neo* nie jest a
 
 ***[TODO]*** o co chodzi z tymi poziomymi i pionowymi kreskami?
 
-```{r}
+```{r cache=TRUE}
 plot(data[,c(6,8,4)])
 ```
 
 Podobnie jak na poprzednim wykresie, i tu najbardziej widoczna jest korelacja między dostępnością dwóch z gatunków planktonu.
 
-```{r}
+```{r cache=TRUE}
 plot(data[,c(9,11,12)])
 ```
 
 Na powyższym wykresie korelacji najbardziej widać odwrotnie proporcjonalną zależność między *fbar* a *totaln* - współczynnik korelacjiwynoszący -0.71) i *cumf* a *totaln*. Można wyraźnie zauważyć że im więcej pierwszego z atrybutów, tym mniej drugiego i odwrotnie.  
 Wysoce proporcjonalne są zmienne *fbar* i *cumf*.
 
-```{r}
+```{r cache=TRUE}
 plot(data[,c(2,13)])
 ```
 
@@ -201,7 +201,7 @@ plot(data[,c(2,13)])
 
 # Zmiana rozmiaru śledzia w czasie
 
-```{r}
+```{r cache=TRUE}
 library(ggplot2)
 library(gganimate)
 library(dplyr)
@@ -219,6 +219,7 @@ p <- ggplot(
 ```{r}
 p + geom_point() + transition_reveal(X)
 ```
+  
 ***[TODO]*** ogarnac kwestie brakujacych danych  
 ***[TODO]*** pobawic sie w pogrupowanie tych miesiecy w pory roku zeby nie bylo tak brzydko na wykresie
 

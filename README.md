@@ -33,7 +33,8 @@ wykorzystane następujące biblioteki: - datasets
 - ggplot2  
 - gganimate  
 - dplyr  
-- gridExtra - gifski package
+- gridExtra  
+- gifski package
 
 Zapewnienie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych
 =========================================================================================
@@ -280,9 +281,6 @@ Ignoring unknown parameters: binwidth, bins, pad"
 
 
     require(gridExtra)
-
-    ## Loading required package: gridExtra
-
     grid.arrange(lengthDissPlot,cfin1DissPlot,cfin2DissPlot ,chel1DissPlot ,chel2DissPlot,lcop1DissPlot,lcop2DissPlot ,fbarDissPlot ,
     recrDissPlot ,cumfDissPlot ,totalnDissPlot ,sstDissPlot ,salDissPlot ,xmonthDissPlot ,naoDissPlot, nrow = 5, ncol=3)
 
@@ -302,8 +300,8 @@ Jeśli chodzi o atrybut jakim jest dostępność planktonu (zarówno
 zagęszczenie *Calanus finmarchicus gat. 1* jak i *Calanus finmarchicus
 gat. 2*) to można zauważyć że w zbiorze znalazło się znacznie więcej
 danych z łowisk o mniejszej dostępności planktonu omawianego gatunku.
-Minimalna dostępność pierwszego gatunku tego planktonu to 0, maksymalna
-- ok 37,67. Srednia to ok. 0,45 a mediana to ok. 0,11. Jeśli chodzi o
+Minimalna dostępność pierwszego gatunku tego planktonu to 0, maksymalna:
+ok 37,67. Srednia to ok. 0,45 a mediana to ok. 0,11. Jeśli chodzi o
 drugi gatunek planktonu *Calanus finmarchicus* to jego minimalne
 zagęszczenie wynosi 0, maksymalne - ok. 19,4, średnia to ok. 2,03 a
 mediana - 0.7.
@@ -344,7 +342,7 @@ temperaturą przy powierzchni wody, a współczynnik tej korelacji wynosi
 -0.45 (czyli są to wartości odwrotnie zależne)
 
 ***\[TODO\]*** Ogarnąć brakujące wartości  
-***\[TODO\]*** Zmniejszyć tekst w srodku zebybylo widac
+***\[TODO\]*** Zmniejszyć tekst w srodku zeby bylo widac
 
     res <- cor(na.omit(data))
     #round(res, 2)
@@ -434,6 +432,7 @@ Zmiana rozmiaru śledzia w czasie
     p + geom_point() + transition_reveal(X)
 
 ![](README_files/figure-markdown_strict/unnamed-chunk-17-1.gif)
+
 ***\[TODO\]*** ogarnac kwestie brakujacych danych  
 ***\[TODO\]*** pobawic sie w pogrupowanie tych miesiecy w pory roku zeby
 nie bylo tak brzydko na wykresie
@@ -443,7 +442,14 @@ Przewidywanie rozmiaru śledzia
 
 W niniejszej sekcji zostanie podjęta próba stworzenia regresora
 przewidującego rozmiar śledzia.  
-***\[TODO\]*** ogarnąć te regresory
+***\[TODO\]*** ogarnąć te regresory  
+***\[TODO\]*** Sekcję próbującą stworzyć regresor przewidujący rozmiar
+śledzia (w tej sekcji należy wykorzystać wiedzę z pozostałych punktów
+oraz wykonać dodatkowe czynności, które mogą poprawić trafność
+predykcji); dobór parametrów modelu oraz oszacowanie jego skuteczności
+powinny zostać wykonane za pomocą techniki podziału zbioru na dane
+uczące, walidujące i testowe; trafność regresji powinna zostać
+oszacowana na podstawie miar R2 i RMSE
 
 Analiza ważnośći atrybutów najlepszego znalezionego modelu regresji
 ===================================================================

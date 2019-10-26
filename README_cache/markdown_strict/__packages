@@ -2,3 +2,6 @@ base
 ggplot2
 ggExtra
 gridExtra
+corrplot
+gganimate
+dplyr
