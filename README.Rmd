@@ -223,13 +223,12 @@ library(gganimate)
 library(dplyr)
 
 p <- ggplot(
-  data,
-  aes(X, length, group = xmonth, color = factor(xmonth))
-  ) +
+  data, aes(X, length, group = xmonth, color = factor(xmonth))) +
   geom_line() +
   scale_color_viridis_d() +
   labs(x = "Kolejne połowy", y = "Dlugosc sledzia") +
   theme(legend.position = "top")
+
 ```
 
 ```{r}
