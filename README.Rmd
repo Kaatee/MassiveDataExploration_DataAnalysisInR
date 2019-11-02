@@ -2,9 +2,11 @@
 title: "Eksploracja Masywnych Danych - projekt 1 - Analiza danych"
 author: "Katarzyna Jóźwiak 127237, Piotr Pawlaczyk 127245"
 output:
+  html_document: 
+   toc: true
+   theme: united
   md_document: 
    toc: true
-   #theme: united
 ---
 data wygenerowania: '`r format(Sys.Date(), "%Y-%B-%d")`'
 
@@ -20,6 +22,7 @@ Do analizy danych i stworzenia raportu z tej analizy zostały wykorzystane nast�
 - dplyr  
 - gridExtra  
 - gifski package
+- imputeTS
 
 # Zapewnienie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych
 Aby zapewnić powtarzalność próbkowań i losowań liczb (m. inn. przy próbkowaniu zbioru) przy każdym odpaleniu programu ustawiono stałe ziarno.  
@@ -94,7 +97,6 @@ Ilość brakujących danych dla poszczególnych kolumn:
 ```{r}
 missingData <- sapply(data, function(x) sum(is.na(x)))
 missingData
-class(missingData)
 ```
 Wykres ilości brakujących danych w zbiorze:
 
@@ -105,32 +107,47 @@ plot(x = factor(names(missingData)), y = missingData, main="Wykres ilości braku
 Jak widać zbiór danych zawiera znaczną ilość brakujących danych, co może utrudnić ich późniejszą analizę.
 
 # Brakujące dane
-***[TODO]*** Kod przetwarzający brakujące dane.
+```{r}
+library("imputeTS")
+data$cfin1 <- na_kalman(data$cfin1)
+data$cfin2 <- na_kalman(data$cfin2)
+data$chel1 <- na_kalman(data$chel1)
+data$chel2 <- na_kalman(data$chel2)
+data$lcop1 <- na_kalman(data$lcop1)
+data$lcop2 <- na_kalman(data$lcop2)
+data$sst <- na_kalman(data$sst)
+```
 
+Ilosć brakujących danych w poszczególnych kolumnach po zastosowaniu filtru Kalman'a:
+
+```{r}
+missingData <- sapply(data, function(x) sum(is.na(x)))
+missingData
+```
 # Szczegółowa analiza zbiorów wartości
-Poniżej przedstawiono rozkłady wszystkich wartośi w zbiorze danych     
-***[TODO]*** Ogarnąć brakujące wartości - chyba że *na.omit(data)* jest ok?  
+Poniżej przedstawiono rozkłady wszystkich wartośi w zbiorze danych  
+
 ***[TODO]*** Zrobić te wykresy troche szersze i wyższe  
-***[TODO]*** Ogarnąć żeby nie wyświetlać warningów: " Warning: Ignoring unknown parameters: binwidth, bins, pad"
+
 ```{r cache=TRUE}
 library(ggplot2)
 library(ggExtra)
 
-lengthDissPlot <- ggplot(na.omit(data), aes(x=length)) + geom_histogram(binwidth=.5, colour="black", fill="white")
-cfin1DissPlot <- ggplot(na.omit(data), aes(x=cfin1)) + geom_histogram(binwidth=1, colour="black", fill="white",stat="count")
-cfin2DissPlot <- ggplot(na.omit(data), aes(x=cfin2)) + geom_histogram(binwidth=1, colour="black", fill="white",stat="count")
-chel1DissPlot <- ggplot(na.omit(data), aes(x=chel1)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
-chel2DissPlot <- ggplot(na.omit(data), aes(x=chel2)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
-lcop1DissPlot <- ggplot(na.omit(data), aes(x=lcop1)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
-lcop2DissPlot <- ggplot(na.omit(data), aes(x=lcop2)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
-fbarDissPlot <- ggplot(na.omit(data), aes(x=fbar)) + geom_histogram(binwidth=.05, colour="black", fill="white")
-recrDissPlot <- ggplot(na.omit(data), aes(x=recr)) + geom_histogram(binwidth=50000.0, colour="black", fill="white")
-cumfDissPlot <- ggplot(na.omit(data), aes(x=cumf)) + geom_histogram(binwidth=.02, colour="black", fill="white")
-totalnDissPlot <- ggplot(na.omit(data), aes(x=totaln)) + geom_histogram(binwidth=1000.0, colour="black", fill="white")
-sstDissPlot <- ggplot(na.omit(data), aes(x=sst)) + geom_histogram(binwidth=1.0, colour="black", fill="white",stat="count")
-salDissPlot <- ggplot(na.omit(data), aes(x=sal)) + geom_histogram(binwidth=.01, colour="black", fill="white")
-xmonthDissPlot <- ggplot(na.omit(data), aes(x=xmonth)) + geom_histogram(binwidth=1.0, colour="black", fill="white")
-naoDissPlot <- ggplot(na.omit(data), aes(x=nao)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+lengthDissPlot <- ggplot(data, aes(x=length)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+cfin1DissPlot <- ggplot(data, aes(x=cfin1)) + geom_histogram(binwidth=1, colour="black", fill="white")
+cfin2DissPlot <- ggplot(data, aes(x=cfin2)) + geom_histogram(binwidth=1, colour="black", fill="white")
+chel1DissPlot <- ggplot(data, aes(x=chel1)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+chel2DissPlot <- ggplot(data, aes(x=chel2)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+lcop1DissPlot <- ggplot(data, aes(x=lcop1)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+lcop2DissPlot <- ggplot(data, aes(x=lcop2)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+fbarDissPlot <- ggplot(data, aes(x=fbar)) + geom_histogram(binwidth=.05, colour="black", fill="white")
+recrDissPlot <- ggplot(data, aes(x=recr)) + geom_histogram(binwidth=50000.0, colour="black", fill="white")
+cumfDissPlot <- ggplot(data, aes(x=cumf)) + geom_histogram(binwidth=.02, colour="black", fill="white")
+totalnDissPlot <- ggplot(data, aes(x=totaln)) + geom_histogram(binwidth=1000.0, colour="black", fill="white")
+sstDissPlot <- ggplot(data, aes(x=sst)) + geom_histogram(binwidth=1.0, colour="black", fill="white")
+salDissPlot <- ggplot(data, aes(x=sal)) + geom_histogram(binwidth=.01, colour="black", fill="white")
+xmonthDissPlot <- ggplot(data, aes(x=xmonth)) + geom_histogram(binwidth=1.0, colour="black", fill="white")
+naoDissPlot <- ggplot(data, aes(x=nao)) + geom_histogram(binwidth=.5, colour="black", fill="white")
 
 
 require(gridExtra)
@@ -144,7 +161,8 @@ Analizując długość śledzia (*length*) można zauważyć, że ten atrybut pr
 
 Jeśli chodzi o atrybut jakim jest dostępność planktonu (zarówno zagęszczenie *Calanus finmarchicus gat. 1* jak i *Calanus finmarchicus gat. 2*) to można zauważyć że w zbiorze znalazło się znacznie więcej danych z łowisk o mniejszej dostępności planktonu omawianego gatunku. Minimalna dostępność pierwszego gatunku tego planktonu to 0, maksymalna: ok 37,67. Srednia to ok. 0,45 a mediana to ok. 0,11. Jeśli chodzi o drugi gatunek planktonu *Calanus finmarchicus* to jego minimalne zagęszczenie wynosi 0, maksymalne - ok. 19,4, średnia to ok. 2,03 a mediana - 0.7.  
 
-***[TODO]*** Opisać reszte
+***[TODO]*** Opisać reszte  
+***[TODO]*** Moze cos z odstającymi danymi - najlepiej zapytac na zajeciach
 
 # Korelacja między zmiennymi
 
@@ -158,11 +176,10 @@ Niski ujemny współczynnik korelacji wskazujący na wysoką korelacje atrybutó
 
 Jeśli chodzi o atrybut, którego będą dotyczyć badania w dalszej części pracy, czyli ługość śledzia, to jest najbardziej skorelowana z temperaturą przy powierzchni wody, a współczynnik tej korelacji wynosi -0.45 (czyli są to wartości odwrotnie zależne)
 
-***[TODO]*** Ogarnąć brakujące wartości  
 ***[TODO]*** Zmniejszyć tekst w srodku zeby bylo widac  
 
 ```{r cache=TRUE}
-res <- cor(na.omit(data))
+res <- cor(data)
 #round(res, 2)
 
 library(corrplot)
@@ -178,7 +195,6 @@ plot(data[,c(5,7,16)])
 W przypadku zaprezentowanych powyżej danych, zgodnie z wartościami mieszczącymi się w macierzy korelacji, największą korelacje (współczynnik korelacji wynoszący 0.96) widać między dostępnością planktonu pierwszego gatunku Calanus helgolandicus (*chel1*) a zagęszczeniem widłonogów z gatunku pierwszego (*lcop2*). Z wykresu wynika, że im więcej jednego plantonu w łowisku, tym spotkać tam można więcej drugiego z wymienionych planktonów.  
 Zależność między *lcop2* a  oscylacja północnoatlantycka  *neo* nie jest aż tak widoczna na wykresie (choć też da się ją zauważyć).  
 
-***[TODO]*** o co chodzi z tymi poziomymi i pionowymi kreskami?
 
 ```{r cache=TRUE}
 plot(data[,c(6,8,4)])
@@ -201,13 +217,13 @@ plot(data[,c(2,13)])
 
 # Zmiana rozmiaru śledzia w czasie
 
-```{r cache=TRUE}
+```{r}
 library(ggplot2)
 library(gganimate)
 library(dplyr)
 
 p <- ggplot(
-  na.omit(data), #ogarnąć brakujące dane
+  data,
   aes(X, length, group = xmonth, color = factor(xmonth))
   ) +
   geom_line() +
@@ -219,8 +235,7 @@ p <- ggplot(
 ```{r}
 p + geom_point() + transition_reveal(X)
 ```
-  
-***[TODO]*** ogarnac kwestie brakujacych danych  
+
 ***[TODO]*** pobawic sie w pogrupowanie tych miesiecy w pory roku zeby nie bylo tak brzydko na wykresie
 
 # Przewidywanie rozmiaru śledzia

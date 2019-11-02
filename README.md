@@ -17,7 +17,7 @@
 -   [Analiza ważnośći atrybutów najlepszego znalezionego modelu
     regresji](#analiza-ważnośći-atrybutów-najlepszego-znalezionego-modelu-regresji)
 
-data wygenerowania: ‘2019-październik-26’
+data wygenerowania: ‘2019-listopad-02’
 
 Podsumowanie badań
 ==================
@@ -229,6 +229,16 @@ Brakujące dane
 
 ***\[TODO\]*** Kod przetwarzający brakujące dane.
 
+data*c**f**i**n*1 &lt;  − *n**a*<sub>*k*</sub>*a**l**m**a**n*(*d**a**t**a*cfin1)
+data*c**f**i**n*2 &lt;  − *n**a*<sub>*k*</sub>*a**l**m**a**n*(*d**a**t**a*cfin2)
+data*c**h**e**l*1 &lt;  − *n**a*<sub>*k*</sub>*a**l**m**a**n*(*d**a**t**a*chel1)
+data*c**h**e**l*2 &lt;  − *n**a*<sub>*k*</sub>*a**l**m**a**n*(*d**a**t**a*chel2)
+data*l**c**o**p*1 &lt;  − *n**a*<sub>*k*</sub>*a**l**m**a**n*(*d**a**t**a*lcop1)
+data*l**c**o**p*2 &lt;  − *n**a*<sub>*k*</sub>*a**l**m**a**n*(*d**a**t**a*lcop2)
+data*s**s**t* &lt;  − *n**a*<sub>*k*</sub>*a**l**m**a**n*(*d**a**t**a*sst)
+
+head(data)
+
 Szczegółowa analiza zbiorów wartości
 ====================================
 
@@ -407,10 +417,6 @@ Zmiana rozmiaru śledzia w czasie
 
     ## 
     ## Attaching package: 'dplyr'
-
-    ## The following object is masked from 'package:gridExtra':
-    ## 
-    ##     combine
 
     ## The following objects are masked from 'package:stats':
     ## 
