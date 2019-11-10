@@ -222,8 +222,10 @@ library(ggplot2)
 library(gganimate)
 library(dplyr)
 
+sampled <- sample_n(data,  round(nrow(data)*0.1))
+
 p <- ggplot(
-  data, aes(X, length, group = xmonth, color = factor(xmonth))) +
+  sampled, aes(X, length, group = xmonth, color = factor(xmonth))) +
   geom_line() +
   scale_color_viridis_d() +
   labs(x = "Kolejne połowy", y = "Dlugosc sledzia") +
@@ -232,8 +234,10 @@ p <- ggplot(
 ```
 
 ```{r}
-p + geom_point() + transition_reveal(X)
+p + transition_reveal(X)
 ```
+
+Z wykresu można zauważyć delikatny spadek śledzia w czasie. Choć na początku rozmiar śledzia znaczie rośnie, to po którkim czasie zaczyna już maleć.
 
 ***[TODO]*** pobawic sie w pogrupowanie tych miesiecy w pory roku zeby nie bylo tak brzydko na wykresie
 
