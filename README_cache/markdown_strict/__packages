@@ -1,7 +1,10 @@
 base
+imputeTS
 ggplot2
 ggExtra
 gridExtra
 corrplot
 gganimate
 dplyr
+lattice
+caret

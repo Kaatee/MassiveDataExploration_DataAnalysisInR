@@ -14,10 +14,14 @@
 -   [Zmiana rozmiaru śledzia w
     czasie](#zmiana-rozmiaru-śledzia-w-czasie)
 -   [Przewidywanie rozmiaru śledzia](#przewidywanie-rozmiaru-śledzia)
+    -   [Random Forest](#random-forest)
+    -   [Regresja liniowa](#regresja-liniowa)
+    -   [kNN](#knn)
+    -   [Porównanie modeli](#porównanie-modeli)
 -   [Analiza ważnośći atrybutów najlepszego znalezionego modelu
     regresji](#analiza-ważnośći-atrybutów-najlepszego-znalezionego-modelu-regresji)
 
-data wygenerowania: ‘2019-listopad-02’
+data wygenerowania: ‘2019-listopad-11’
 
 Podsumowanie badań
 ==================
@@ -34,7 +38,9 @@ wykorzystane następujące biblioteki: - datasets
 - gganimate  
 - dplyr  
 - gridExtra  
-- gifski package
+- gifski package  
+- imputeTS  
+- caret
 
 Zapewnienie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych
 =========================================================================================
@@ -112,8 +118,9 @@ Wyświetlenie klas poszczególnych kolumn:
     ##         sst         sal      xmonth         nao 
     ## "character"   "numeric"   "integer"   "numeric"
 
-Dane zawierające znak “?” zostały zinterpretowane jako tekst. Zmiana “?”
-na “NA” wraz ze zmianą typu danych z character na numeric:
+Dane zawierające znak “?” zostały zinterpretowane jako tekst.  
+Z uwagi na występowanie brakujących danych konieczna była zmiana “?” na
+“NA” wraz ze zmianą typu danych z character na numeric:
 
     data[data=="?"] <- NA
 
@@ -153,9 +160,6 @@ nieznanymi wartościami na wartości numeryczne.
     ## "numeric" "numeric" "integer" "numeric" "numeric" "numeric" "numeric" 
     ##    xmonth       nao 
     ## "integer" "numeric"
-
-***\[TODO\]*** może to jakoś ładniej zrobić “as.numeric” a nie tak
-brzydko powtarzając kod
 
 Rozmiar zbioru danych i podstawowe statystyki
 =============================================
@@ -211,10 +215,6 @@ Ilość brakujących danych dla poszczególnych kolumn:
     ##   cumf totaln    sst    sal xmonth    nao 
     ##      0      0   1584      0      0      0
 
-    class(missingData)
-
-    ## [1] "integer"
-
 Wykres ilości brakujących danych w zbiorze:
 
     plot(x = factor(names(missingData)), y = missingData, main="Wykres ilości brakujących danych w zbiorze", xlab="atrybut", ylab = "ilość brakujących artybutów")
@@ -227,74 +227,59 @@ utrudnić ich późniejszą analizę.
 Brakujące dane
 ==============
 
-***\[TODO\]*** Kod przetwarzający brakujące dane.
+    library("imputeTS")
+    data$cfin1 <- na_kalman(data$cfin1)
+    data$cfin2 <- na_kalman(data$cfin2)
+    data$chel1 <- na_kalman(data$chel1)
+    data$chel2 <- na_kalman(data$chel2)
+    data$lcop1 <- na_kalman(data$lcop1)
+    data$lcop2 <- na_kalman(data$lcop2)
+    data$sst <- na_kalman(data$sst)
 
-data*c**f**i**n*1 &lt;  − *n**a*<sub>*k*</sub>*a**l**m**a**n*(*d**a**t**a*cfin1)
-data*c**f**i**n*2 &lt;  − *n**a*<sub>*k*</sub>*a**l**m**a**n*(*d**a**t**a*cfin2)
-data*c**h**e**l*1 &lt;  − *n**a*<sub>*k*</sub>*a**l**m**a**n*(*d**a**t**a*chel1)
-data*c**h**e**l*2 &lt;  − *n**a*<sub>*k*</sub>*a**l**m**a**n*(*d**a**t**a*chel2)
-data*l**c**o**p*1 &lt;  − *n**a*<sub>*k*</sub>*a**l**m**a**n*(*d**a**t**a*lcop1)
-data*l**c**o**p*2 &lt;  − *n**a*<sub>*k*</sub>*a**l**m**a**n*(*d**a**t**a*lcop2)
-data*s**s**t* &lt;  − *n**a*<sub>*k*</sub>*a**l**m**a**n*(*d**a**t**a*sst)
+Ilosć brakujących danych w poszczególnych kolumnach po zastosowaniu
+filtru Kalman’a:
 
-head(data)
+    missingData <- sapply(data, function(x) sum(is.na(x)))
+    missingData
+
+    ##      X length  cfin1  cfin2  chel1  chel2  lcop1  lcop2   fbar   recr 
+    ##      0      0      0      0      0      0      0      0      0      0 
+    ##   cumf totaln    sst    sal xmonth    nao 
+    ##      0      0      0      0      0      0
+
+Z powyższej tabeli wynika, że filtr Kalman’a poradził sobie ze
+wszystkimi brakującymi danymi.
 
 Szczegółowa analiza zbiorów wartości
 ====================================
 
-Poniżej przedstawiono rozkłady wszystkich wartośi w zbiorze danych  
-***\[TODO\]*** Ogarnąć brakujące wartości - chyba że *na.omit(data)*
-jest ok?  
-***\[TODO\]*** Zrobić te wykresy troche szersze i wyższe  
-***\[TODO\]*** Ogarnąć żeby nie wyświetlać warningów: " Warning:
-Ignoring unknown parameters: binwidth, bins, pad"
+Poniżej przedstawiono rozkłady wszystkich wartośi w zbiorze danych
 
     library(ggplot2)
     library(ggExtra)
 
-    lengthDissPlot <- ggplot(na.omit(data), aes(x=length)) + geom_histogram(binwidth=.5, colour="black", fill="white")
-    cfin1DissPlot <- ggplot(na.omit(data), aes(x=cfin1)) + geom_histogram(binwidth=1, colour="black", fill="white",stat="count")
-
-    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
-
-    cfin2DissPlot <- ggplot(na.omit(data), aes(x=cfin2)) + geom_histogram(binwidth=1, colour="black", fill="white",stat="count")
-
-    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
-
-    chel1DissPlot <- ggplot(na.omit(data), aes(x=chel1)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
-
-    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
-
-    chel2DissPlot <- ggplot(na.omit(data), aes(x=chel2)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
-
-    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
-
-    lcop1DissPlot <- ggplot(na.omit(data), aes(x=lcop1)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
-
-    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
-
-    lcop2DissPlot <- ggplot(na.omit(data), aes(x=lcop2)) + geom_histogram(binwidth=.5, colour="black", fill="white",stat="count")
-
-    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
-
-    fbarDissPlot <- ggplot(na.omit(data), aes(x=fbar)) + geom_histogram(binwidth=.05, colour="black", fill="white")
-    recrDissPlot <- ggplot(na.omit(data), aes(x=recr)) + geom_histogram(binwidth=50000.0, colour="black", fill="white")
-    cumfDissPlot <- ggplot(na.omit(data), aes(x=cumf)) + geom_histogram(binwidth=.02, colour="black", fill="white")
-    totalnDissPlot <- ggplot(na.omit(data), aes(x=totaln)) + geom_histogram(binwidth=1000.0, colour="black", fill="white")
-    sstDissPlot <- ggplot(na.omit(data), aes(x=sst)) + geom_histogram(binwidth=1.0, colour="black", fill="white",stat="count")
-
-    ## Warning: Ignoring unknown parameters: binwidth, bins, pad
-
-    salDissPlot <- ggplot(na.omit(data), aes(x=sal)) + geom_histogram(binwidth=.01, colour="black", fill="white")
-    xmonthDissPlot <- ggplot(na.omit(data), aes(x=xmonth)) + geom_histogram(binwidth=1.0, colour="black", fill="white")
-    naoDissPlot <- ggplot(na.omit(data), aes(x=nao)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+    lengthDissPlot <- ggplot(data, aes(x=length)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+    cfin1DissPlot <- ggplot(data, aes(x=cfin1)) + geom_histogram(binwidth=1, colour="black", fill="white")
+    cfin2DissPlot <- ggplot(data, aes(x=cfin2)) + geom_histogram(binwidth=1, colour="black", fill="white")
+    chel1DissPlot <- ggplot(data, aes(x=chel1)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+    chel2DissPlot <- ggplot(data, aes(x=chel2)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+    lcop1DissPlot <- ggplot(data, aes(x=lcop1)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+    lcop2DissPlot <- ggplot(data, aes(x=lcop2)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+    fbarDissPlot <- ggplot(data, aes(x=fbar)) + geom_histogram(binwidth=.05, colour="black", fill="white")
+    recrDissPlot <- ggplot(data, aes(x=recr)) + geom_histogram(binwidth=50000.0, colour="black", fill="white")
+    cumfDissPlot <- ggplot(data, aes(x=cumf)) + geom_histogram(binwidth=.02, colour="black", fill="white")
+    totalnDissPlot <- ggplot(data, aes(x=totaln)) + geom_histogram(binwidth=1000.0, colour="black", fill="white")
+    sstDissPlot <- ggplot(data, aes(x=sst)) + geom_histogram(binwidth=1.0, colour="black", fill="white")
+    salDissPlot <- ggplot(data, aes(x=sal)) + geom_histogram(binwidth=.01, colour="black", fill="white")
+    xmonthDissPlot <- ggplot(data, aes(x=xmonth)) + geom_histogram(binwidth=1.0, colour="black", fill="white")
+    naoDissPlot <- ggplot(data, aes(x=nao)) + geom_histogram(binwidth=.5, colour="black", fill="white")
 
 
     require(gridExtra)
     grid.arrange(lengthDissPlot,cfin1DissPlot,cfin2DissPlot ,chel1DissPlot ,chel2DissPlot,lcop1DissPlot,lcop2DissPlot ,fbarDissPlot ,
     recrDissPlot ,cumfDissPlot ,totalnDissPlot ,sstDissPlot ,salDissPlot ,xmonthDissPlot ,naoDissPlot, nrow = 5, ncol=3)
 
-![](README_files/figure-markdown_strict/unnamed-chunk-10-1.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-12-1.png)
 
 Z powyższych wykresów wynika, że jeśli chodzi o rozkład poszczególnych
 atrybutów to zbiór nie jest zrównoważony.
@@ -309,14 +294,38 @@ długość 25.3cm, a mediana to 25,5.
 Jeśli chodzi o atrybut jakim jest dostępność planktonu (zarówno
 zagęszczenie *Calanus finmarchicus gat. 1* jak i *Calanus finmarchicus
 gat. 2*) to można zauważyć że w zbiorze znalazło się znacznie więcej
-danych z łowisk o mniejszej dostępności planktonu omawianego gatunku.
-Minimalna dostępność pierwszego gatunku tego planktonu to 0, maksymalna:
-ok 37,67. Srednia to ok. 0,45 a mediana to ok. 0,11. Jeśli chodzi o
-drugi gatunek planktonu *Calanus finmarchicus* to jego minimalne
-zagęszczenie wynosi 0, maksymalne - ok. 19,4, średnia to ok. 2,03 a
-mediana - 0.7.
+danych z łowisk o mniejszej dostępności planktonu omawianego gatunku. Ze
+wcześniejszej analizy wiemy, że minimalna dostępność pierwszego gatunku
+tego planktonu to 0, maksymalna: ok 37,67. Srednia to ok. 0,45 a mediana
+to ok. 0,11. Jeśli chodzi o drugi gatunek planktonu *Calanus
+finmarchicus* to jego minimalne zagęszczenie wynosi 0, maksymalne - ok.
+19,4, średnia to ok. 2,03 a mediana - 0.7.
 
-***\[TODO\]*** Opisać reszte
+Kolejnym badanym atrybutem jest dostępność planktonu gatunku *Calanus
+helgolandicus gat. 1* i *Calanus helgolandicus gat. 1*. W przypadku
+pierwszego z nich w zbiorze znalazło się więcej śledzi złowionych na
+łowisku o mniejszej zawartości planktonu. W Przypadku drugiego gatunku
+planktonu rozkład ilości złowionych tam śledzi był bardziej rozłożony w
+przedziale 0-40. O śledziach złapanych w miejscach gdzie zagęszczenie
+omawianego planktonu drugiego gatunku osiąga przedział 40-60 można
+powiedzieć że są towartości odstające. Jeśli chodzi o zagęszczenie
+pierwszego gatunku to ze wcześniejszej analizy wynika, że atrubut
+tenprzyjmuje minimalną wartość równą 0, a maksymalną równą 75. Jego
+średnia występowania to ok. 10, a mediana to 5.75. Jeśli chodzi o
+minimalną wartość dostępności planktonu drugiego gatunku *Calanus
+helgolandicus* to jego minimalna wartość to ok. 5.2, maksymalna: ok.
+57.7, średnia to ok. 21.2, a mediana wynosi około 21.7.
+
+Ostatnim z planktonów, których dostępność badaliśmy są widłonogi dwóch
+gatunków (*lcop1* i *lcop2*). ***\[TOTO\]*** Kolejnym atrybutem jest
+natężenie połowów w regionie (ułamek pozostawionego narybku) - *fbar*.
+***\[TOTO\]*** Następnym z znalizowanych atrybutów będzie ilość rocznego
+narybku (czyli liczba śledzi) - *recr*. ***\[TOTO\]*** ***cumf: łączne
+roczne natężenie połowów w regionie \[ułamek pozostawionego narybku\]; *
+totaln: łączna liczba ryb złowionych w ramach połowu \[liczba śledzi\];
+\* sst: temperatura przy powierzchni wody \[°C\]; \* sal: poziom
+zasolenia wody \[Knudsen ppt\]; \* xmonth: miesiąc połowu \[numer
+miesiąca\]; \* nao: oscylacja północnoatlantycka \[mb\].**\*
 
 Korelacja między zmiennymi
 ==========================
@@ -351,26 +360,19 @@ pracy, czyli ługość śledzia, to jest najbardziej skorelowana z
 temperaturą przy powierzchni wody, a współczynnik tej korelacji wynosi
 -0.45 (czyli są to wartości odwrotnie zależne)
 
-***\[TODO\]*** Ogarnąć brakujące wartości  
-***\[TODO\]*** Zmniejszyć tekst w srodku zeby bylo widac
-
-    res <- cor(na.omit(data))
-    #round(res, 2)
+    res <- cor(data)
 
     library(corrplot)
-
-    ## corrplot 0.84 loaded
-
     corrplot.mixed(res, tl.col = "black", tl.srt = 45)
 
-![](README_files/figure-markdown_strict/unnamed-chunk-11-1.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-13-1.png)
 
 Żeby lepiej zwizualizować korelacje między omówionymi atrybutami
 przedstawiono wykresy zależności tych atrybutów.
 
     plot(data[,c(5,7,16)])
 
-![](README_files/figure-markdown_strict/unnamed-chunk-12-1.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-14-1.png)
 
 W przypadku zaprezentowanych powyżej danych, zgodnie z wartościami
 mieszczącymi się w macierzy korelacji, największą korelacje
@@ -382,31 +384,22 @@ więcej drugiego z wymienionych planktonów.
 Zależność między *lcop2* a oscylacja północnoatlantycka *neo* nie jest
 aż tak widoczna na wykresie (choć też da się ją zauważyć).
 
-***\[TODO\]*** o co chodzi z tymi poziomymi i pionowymi kreskami?
-
     plot(data[,c(6,8,4)])
 
-![](README_files/figure-markdown_strict/unnamed-chunk-13-1.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-15-1.png)
 
 Podobnie jak na poprzednim wykresie, i tu najbardziej widoczna jest
 korelacja między dostępnością dwóch z gatunków planktonu.
 
     plot(data[,c(9,11,12)])
 
-![](README_files/figure-markdown_strict/unnamed-chunk-14-1.png)
+![](README_files/figure-markdown_strict/unnamed-chunk-16-1.png)
 
 Na powyższym wykresie korelacji najbardziej widać odwrotnie
 proporcjonalną zależność między *fbar* a *totaln* - współczynnik
 korelacjiwynoszący -0.71) i *cumf* a *totaln*. Można wyraźnie zauważyć
 że im więcej pierwszego z atrybutów, tym mniej drugiego i odwrotnie.  
 Wysoce proporcjonalne są zmienne *fbar* i *cumf*.
-
-    plot(data[,c(2,13)])
-
-![](README_files/figure-markdown_strict/unnamed-chunk-15-1.png)
-
-***\[TODO\]*** Nie mam pojęcia jak opisać ten wykres, jak sie nie dowiem
-to wywalić :P
 
 Zmiana rozmiaru śledzia w czasie
 ================================
@@ -415,47 +408,425 @@ Zmiana rozmiaru śledzia w czasie
     library(gganimate)
     library(dplyr)
 
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
+    sampled <- sample_n(data,  round(nrow(data)*0.1))
 
     p <- ggplot(
-      na.omit(data), #ogarnąć brakujące dane
-      aes(X, length, group = xmonth, color = factor(xmonth))
-      ) +
+      sampled, aes(X, length, group = xmonth, color = factor(xmonth))) +
       geom_line() +
       scale_color_viridis_d() +
       labs(x = "Kolejne połowy", y = "Dlugosc sledzia") +
       theme(legend.position = "top")
 
-    p + geom_point() + transition_reveal(X)
+    p + transition_reveal(X)
 
-![](README_files/figure-markdown_strict/unnamed-chunk-17-1.gif)
+![](README_files/figure-markdown_strict/unnamed-chunk-18-1.gif)
 
-***\[TODO\]*** ogarnac kwestie brakujacych danych  
-***\[TODO\]*** pobawic sie w pogrupowanie tych miesiecy w pory roku zeby
-nie bylo tak brzydko na wykresie
+Z wykresu można zauważyć delikatny spadek śledzia w czasie. Choć na
+początku rozmiar śledzia znaczie rośnie, to po którkim czasie zaczyna
+już maleć.
 
 Przewidywanie rozmiaru śledzia
 ==============================
 
-W niniejszej sekcji zostanie podjęta próba stworzenia regresora
-przewidującego rozmiar śledzia.  
-***\[TODO\]*** ogarnąć te regresory  
-***\[TODO\]*** Sekcję próbującą stworzyć regresor przewidujący rozmiar
-śledzia (w tej sekcji należy wykorzystać wiedzę z pozostałych punktów
-oraz wykonać dodatkowe czynności, które mogą poprawić trafność
-predykcji); dobór parametrów modelu oraz oszacowanie jego skuteczności
-powinny zostać wykonane za pomocą techniki podziału zbioru na dane
-uczące, walidujące i testowe; trafność regresji powinna zostać
-oszacowana na podstawie miar R2 i RMSE
+***\[TODO\]*** wywaliś z danych X!!! W niniejszej sekcji zostanie
+podjęta próba stworzenia regresora przewidującego rozmiar śledzia.
+
+W niniejszym rozdziale postaramy się przewidzieć rozmiar śledzia z
+wykorzystaniem różnych metod uczenia maszynowego. W tym celu na początek
+dane zostaną podzielone na zbiór uczący (stanowiący 75% całego zbioru
+danych) i testowy (stanowiący 25% całego zbioru danych).
+
+Parametry zostały domyślnie zoptymalizowane wybierając trzy wartości dla
+każdego zdefiniowanego dla modelu parametru optymalizacyjnego.
+
+Do badań zostanie wykorzystana powtarzana ocena krzyżowa.
+
+    library(caret)
+    library(ggplot2)
+    library(gganimate)
+    library(dplyr)
+
+    inTraining <- createDataPartition(y = data$length, p = .75,list = FALSE)
+
+    training <- data[ inTraining, ]
+    testing  <- data[-inTraining, ]
+
+    ctrl <- trainControl( method = "repeatedcv", number = 5, repeats = 10)
+
+Random Forest
+-------------
+
+Pierwszym z wykorzystanych algorytmów będzie Random Forest z liczbą
+drzew w lesie równą 10.
+
+    fitRandomForestF <- train(length ~ ., data = training, method = "rf", importance=T, trControl = ctrl, ntree = 10) 
+    fitRandomForestF
+
+    ## Random Forest 
+    ## 
+    ## 39438 samples
+    ##    15 predictor
+    ## 
+    ## No pre-processing
+    ## Resampling: Cross-Validated (5 fold, repeated 10 times) 
+    ## Summary of sample sizes: 31549, 31550, 31550, 31552, 31551, 31552, ... 
+    ## Resampling results across tuning parameters:
+    ## 
+    ##   mtry  RMSE      Rsquared   MAE      
+    ##    2    1.122600  0.5379404  0.8861271
+    ##    8    1.111296  0.5521322  0.8722134
+    ##   15    1.181804  0.5105627  0.9272984
+    ## 
+    ## RMSE was used to select the optimal model using the smallest value.
+    ## The final value used for the model was mtry = 8.
+
+    rfClasses <- predict(fitRandomForestF, newdata = testing)
+    rfClasses <- sapply(rfClasses, round, digits = 0)
+
+    availableValues <- sapply(testing$length, round, digits = 0)
+    levels <- unique(c(availableValues, rfClasses))
+
+    confusionMatrix <- confusionMatrix(data = factor(rfClasses, levels = levels),   factor(availableValues, levels = levels))
+    confusionMatrix
+
+    ## Confusion Matrix and Statistics
+    ## 
+    ##           Reference
+    ## Prediction   23   22   24   26   21   20   25   27   28   30   29   32
+    ##         23  267  404  530   38   27   14   67    3    1    0    0    0
+    ##         22   25   93   43    1   18   10    3    0    0    0    0    0
+    ##         24  237  222  978  244    9    1  244   16   10    0    0    0
+    ##         26   36    8  439 1772    0    0  439  384  391   10   10    1
+    ##         21    0    7    1    0    3    2    0    0    0    0    0    0
+    ##         20    0    0    0    0    0    0    0    0    0    0    0    0
+    ##         25  102   50 1200 1302    3    0  615  131   76    2    3    1
+    ##         27    5    1   82  799    0    0   91  372  726   12   28    2
+    ##         28    0    1    8   99    0    0    5   72  260   25   38    0
+    ##         30    0    0    0    0    0    0    0    0    0    0    0    0
+    ##         29    0    0    1    4    0    0    0    4    9    2    3    0
+    ##         32    0    0    0    0    0    0    0    0    0    0    0    0
+    ##         31    0    0    0    0    0    0    0    0    0    0    0    0
+    ##           Reference
+    ## Prediction   31
+    ##         23    0
+    ##         22    0
+    ##         24    0
+    ##         26    0
+    ##         21    0
+    ##         20    0
+    ##         25    0
+    ##         27    1
+    ##         28    1
+    ##         30    0
+    ##         29    0
+    ##         32    0
+    ##         31    0
+    ## 
+    ## Overall Statistics
+    ##                                           
+    ##                Accuracy : 0.3319          
+    ##                  95% CI : (0.3239, 0.3401)
+    ##     No Information Rate : 0.324           
+    ##     P-Value [Acc > NIR] : 0.02705         
+    ##                                           
+    ##                   Kappa : 0.1899          
+    ##                                           
+    ##  Mcnemar's Test P-Value : NA              
+    ## 
+    ## Statistics by Class:
+    ## 
+    ##                      Class: 23 Class: 22 Class: 24 Class: 26 Class: 21
+    ## Sensitivity            0.39732  0.118321   0.29799    0.4161 0.0500000
+    ## Specificity            0.91309  0.991908   0.90032    0.8066 0.9992357
+    ## Pos Pred Value         0.19763  0.481865   0.49873    0.5077 0.2307692
+    ## Neg Pred Value         0.96566  0.946491   0.79397    0.7424 0.9956591
+    ## Prevalence             0.05113  0.059799   0.24970    0.3240 0.0045648
+    ## Detection Rate         0.02031  0.007075   0.07441    0.1348 0.0002282
+    ## Detection Prevalence   0.10278  0.014684   0.14919    0.2655 0.0009890
+    ## Balanced Accuracy      0.65520  0.555114   0.59916    0.6114 0.5246179
+    ##                      Class: 20 Class: 25 Class: 27 Class: 28 Class: 30
+    ## Sensitivity           0.000000   0.42008   0.37882   0.17651   0.00000
+    ## Specificity           1.000000   0.75428   0.85636   0.97867   1.00000
+    ## Pos Pred Value             NaN   0.17647   0.17555   0.51081       NaN
+    ## Neg Pred Value        0.997946   0.91210   0.94467   0.90400   0.99612
+    ## Prevalence            0.002054   0.11138   0.07471   0.11207   0.00388
+    ## Detection Rate        0.000000   0.04679   0.02830   0.01978   0.00000
+    ## Detection Prevalence  0.000000   0.26514   0.16121   0.03872   0.00000
+    ## Balanced Accuracy     0.500000   0.58718   0.61759   0.57759   0.50000
+    ##                      Class: 29 Class: 32 Class: 31
+    ## Sensitivity          0.0365854 0.0000000 0.0000000
+    ## Specificity          0.9984688 1.0000000 1.0000000
+    ## Pos Pred Value       0.1304348       NaN       NaN
+    ## Neg Pred Value       0.9939791 0.9996957 0.9998478
+    ## Prevalence           0.0062386 0.0003043 0.0001522
+    ## Detection Rate       0.0002282 0.0000000 0.0000000
+    ## Detection Prevalence 0.0017498 0.0000000 0.0000000
+    ## Balanced Accuracy    0.5175271 0.5000000 0.5000000
+
+    confusionMatrix$overall
+
+    ##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
+    ##     0.33193853     0.18988195     0.32388795     0.34006358     0.32402617 
+    ## AccuracyPValue  McnemarPValue 
+    ##     0.02705031            NaN
+
+***\[TODO\]*** opisac cos o tym
+
+Regresja liniowa
+----------------
+
+Kolejnym przebadanym regresorem będzie regresja liniowa
+
+    fitLR <- train(length ~ ., data = training, method = "lm", importance=T, trControl = ctrl)
+    fitLR
+
+    ## Linear Regression 
+    ## 
+    ## 39438 samples
+    ##    15 predictor
+    ## 
+    ## No pre-processing
+    ## Resampling: Cross-Validated (5 fold, repeated 10 times) 
+    ## Summary of sample sizes: 31551, 31550, 31551, 31549, 31551, 31552, ... 
+    ## Resampling results:
+    ## 
+    ##   RMSE      Rsquared   MAE     
+    ##   1.327042  0.3539804  1.046856
+    ## 
+    ## Tuning parameter 'intercept' was held constant at a value of TRUE
+
+    lrClasses <- predict(fitLR, newdata = testing)
+    lrClasses <- sapply(lrClasses, round, digits = 0)
+
+    availableValues <- sapply(testing$length, round, digits = 0)
+    levels <- unique(c(availableValues, lrClasses))
+
+    confusionMatrix <- confusionMatrix(data = factor(lrClasses, levels = levels),   factor(availableValues, levels = levels))
+    confusionMatrix
+
+    ## Confusion Matrix and Statistics
+    ## 
+    ##           Reference
+    ## Prediction   23   22   24   26   21   20   25   27   28   30   29   32
+    ##         23  134  208  268   38    7    1   42    2    0    0    0    0
+    ##         22    0    0    0    0    0    0    0    0    0    0    0    0
+    ##         24  251  284  791  240   19    9  211   12    2    0    0    0
+    ##         26   38   20  637 1922    0    0  437  493  870   24   45    2
+    ##         21    0    0    0    0    0    0    0    0    0    0    0    0
+    ##         20    0    0    0    0    0    0    0    0    0    0    0    0
+    ##         25  246  272 1545 1715   34   17  744  284  208    7    7    0
+    ##         27    3    1   30  304    0    0   20  173  347   19   27    1
+    ##         28    0    1   11   39    0    0   10   18   46    1    3    1
+    ##         30    0    0    0    1    0    0    0    0    0    0    0    0
+    ##         29    0    0    0    0    0    0    0    0    0    0    0    0
+    ##         32    0    0    0    0    0    0    0    0    0    0    0    0
+    ##         31    0    0    0    0    0    0    0    0    0    0    0    0
+    ##           Reference
+    ## Prediction   31
+    ##         23    0
+    ##         22    0
+    ##         24    0
+    ##         26    1
+    ##         21    0
+    ##         20    0
+    ##         25    0
+    ##         27    0
+    ##         28    1
+    ##         30    0
+    ##         29    0
+    ##         32    0
+    ##         31    0
+    ## 
+    ## Overall Statistics
+    ##                                           
+    ##                Accuracy : 0.2899          
+    ##                  95% CI : (0.2821, 0.2977)
+    ##     No Information Rate : 0.324           
+    ##     P-Value [Acc > NIR] : 1               
+    ##                                           
+    ##                   Kappa : 0.1153          
+    ##                                           
+    ##  Mcnemar's Test P-Value : NA              
+    ## 
+    ## Statistics by Class:
+    ## 
+    ##                      Class: 23 Class: 22 Class: 24 Class: 26 Class: 21
+    ## Sensitivity            0.19940    0.0000   0.24101    0.4513  0.000000
+    ## Specificity            0.95462    1.0000   0.89576    0.7111  1.000000
+    ## Pos Pred Value         0.19143       NaN   0.43485    0.4282       NaN
+    ## Neg Pred Value         0.95677    0.9402   0.78004    0.7300  0.995435
+    ## Prevalence             0.05113    0.0598   0.24970    0.3240  0.004565
+    ## Detection Rate         0.01019    0.0000   0.06018    0.1462  0.000000
+    ## Detection Prevalence   0.05326    0.0000   0.13839    0.3415  0.000000
+    ## Balanced Accuracy      0.57701    0.5000   0.56839    0.5812  0.500000
+    ##                      Class: 20 Class: 25 Class: 27 Class: 28 Class: 30
+    ## Sensitivity           0.000000    0.5082   0.17617  0.031229 0.000e+00
+    ## Specificity           1.000000    0.6289   0.93817  0.992717 9.999e-01
+    ## Pos Pred Value             NaN    0.1465   0.18703  0.351145 0.000e+00
+    ## Neg Pred Value        0.997946    0.9107   0.93379  0.890340 9.961e-01
+    ## Prevalence            0.002054    0.1114   0.07471  0.112066 3.880e-03
+    ## Detection Rate        0.000000    0.0566   0.01316  0.003500 0.000e+00
+    ## Detection Prevalence  0.000000    0.3864   0.07037  0.009967 7.608e-05
+    ## Balanced Accuracy     0.500000    0.5685   0.55717  0.511973 5.000e-01
+    ##                      Class: 29 Class: 32 Class: 31
+    ## Sensitivity           0.000000 0.0000000 0.0000000
+    ## Specificity           1.000000 1.0000000 1.0000000
+    ## Pos Pred Value             NaN       NaN       NaN
+    ## Neg Pred Value        0.993761 0.9996957 0.9998478
+    ## Prevalence            0.006239 0.0003043 0.0001522
+    ## Detection Rate        0.000000 0.0000000 0.0000000
+    ## Detection Prevalence  0.000000 0.0000000 0.0000000
+    ## Balanced Accuracy     0.500000 0.5000000 0.5000000
+
+    confusionMatrix$overall
+
+    ##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
+    ##      0.2898661      0.1152575      0.2821190      0.2977063      0.3240262 
+    ## AccuracyPValue  McnemarPValue 
+    ##      1.0000000            NaN
+
+***\[TODO\]*** opisac cos o tym
+
+kNN
+---
+
+Ostatnim z przebadanych algorytmów został kNN
+
+    fitKNN <- train(length ~ ., data = training, method = "knn", importance=T, trControl = ctrl)
+    fitKNN
+
+    ## k-Nearest Neighbors 
+    ## 
+    ## 39438 samples
+    ##    15 predictor
+    ## 
+    ## No pre-processing
+    ## Resampling: Cross-Validated (5 fold, repeated 10 times) 
+    ## Summary of sample sizes: 31551, 31552, 31549, 31550, 31550, 31551, ... 
+    ## Resampling results across tuning parameters:
+    ## 
+    ##   k  RMSE      Rsquared   MAE      
+    ##   5  1.123669  0.5447638  0.8812479
+    ##   7  1.107900  0.5540048  0.8701258
+    ##   9  1.100991  0.5579812  0.8652422
+    ## 
+    ## RMSE was used to select the optimal model using the smallest value.
+    ## The final value used for the model was k = 9.
+
+    knnClasses <- predict(fitKNN, newdata = testing)
+    knnClasses <- sapply(knnClasses, round, digits = 0)
+
+    availableValues <- sapply(testing$length, round, digits = 0)
+    levels <- unique(c(availableValues, knnClasses))
+
+    confusionMatrix <- confusionMatrix(data = factor(knnClasses, levels = levels),   factor(availableValues, levels = levels))
+    confusionMatrix
+
+    ## Confusion Matrix and Statistics
+    ## 
+    ##           Reference
+    ## Prediction   23   22   24   26   21   20   25   27   28   30   29   32
+    ##         23  257  386  495   33   26   13   47    3    0    0    0    0
+    ##         22   32  108   38    1   21   10    4    0    0    0    0    0
+    ##         24  253  224 1050  269   11    2  274    9   13    0    0    0
+    ##         26   33    7  469 1888    1    0  467  430  410    9   11    0
+    ##         21    1    4    0    0    0    1    0    0    0    0    0    0
+    ##         20    0    0    0    0    0    0    0    0    0    0    0    0
+    ##         25   92   56 1153 1204    1    1  595  125   64    3    2    1
+    ##         27    4    1   69  777    0    0   70  341  694   10   31    2
+    ##         28    0    0    7   86    0    0    7   74  288   28   37    1
+    ##         30    0    0    0    0    0    0    0    0    0    0    0    0
+    ##         29    0    0    1    1    0    0    0    0    4    1    1    0
+    ##         32    0    0    0    0    0    0    0    0    0    0    0    0
+    ##         31    0    0    0    0    0    0    0    0    0    0    0    0
+    ##           Reference
+    ## Prediction   31
+    ##         23    0
+    ##         22    0
+    ##         24    0
+    ##         26    0
+    ##         21    0
+    ##         20    0
+    ##         25    0
+    ##         27    1
+    ##         28    1
+    ##         30    0
+    ##         29    0
+    ##         32    0
+    ##         31    0
+    ## 
+    ## Overall Statistics
+    ##                                           
+    ##                Accuracy : 0.3445          
+    ##                  95% CI : (0.3364, 0.3527)
+    ##     No Information Rate : 0.324           
+    ##     P-Value [Acc > NIR] : 3.197e-07       
+    ##                                           
+    ##                   Kappa : 0.1991          
+    ##                                           
+    ##  Mcnemar's Test P-Value : NA              
+    ## 
+    ## Statistics by Class:
+    ## 
+    ##                      Class: 23 Class: 22 Class: 24 Class: 26 Class: 21
+    ## Sensitivity            0.38244  0.137405   0.31993    0.4433 0.0000000
+    ## Specificity            0.91958  0.991423   0.89302    0.7932 0.9995414
+    ## Pos Pred Value         0.20397  0.504673   0.49881    0.5068 0.0000000
+    ## Neg Pred Value         0.96508  0.947564   0.79781    0.7483 0.9954331
+    ## Prevalence             0.05113  0.059799   0.24970    0.3240 0.0045648
+    ## Detection Rate         0.01955  0.008217   0.07988    0.1436 0.0000000
+    ## Detection Prevalence   0.09586  0.016281   0.16015    0.2834 0.0004565
+    ## Balanced Accuracy      0.65101  0.564414   0.60648    0.6183 0.4997707
+    ##                      Class: 20 Class: 25 Class: 27 Class: 28 Class: 30
+    ## Sensitivity           0.000000   0.40642   0.34725   0.19552   0.00000
+    ## Specificity           1.000000   0.76866   0.86359   0.97935   1.00000
+    ## Pos Pred Value             NaN   0.18047   0.17050   0.54442       NaN
+    ## Neg Pred Value        0.997946   0.91175   0.94248   0.90606   0.99612
+    ## Prevalence            0.002054   0.11138   0.07471   0.11207   0.00388
+    ## Detection Rate        0.000000   0.04527   0.02594   0.02191   0.00000
+    ## Detection Prevalence  0.000000   0.25084   0.15216   0.04025   0.00000
+    ## Balanced Accuracy     0.500000   0.58754   0.60542   0.58743   0.50000
+    ##                      Class: 29 Class: 32 Class: 31
+    ## Sensitivity          1.220e-02 0.0000000 0.0000000
+    ## Specificity          9.995e-01 1.0000000 1.0000000
+    ## Pos Pred Value       1.250e-01       NaN       NaN
+    ## Neg Pred Value       9.938e-01 0.9996957 0.9998478
+    ## Prevalence           6.239e-03 0.0003043 0.0001522
+    ## Detection Rate       7.608e-05 0.0000000 0.0000000
+    ## Detection Prevalence 6.086e-04 0.0000000 0.0000000
+    ## Balanced Accuracy    5.058e-01 0.5000000 0.5000000
+
+    plot(fitKNN)
+
+![](README_files/figure-markdown_strict/unnamed-chunk-25-1.png)
+
+    confusionMatrix$overall
+
+    ##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
+    ##   3.444918e-01   1.991203e-01   3.363650e-01   3.526874e-01   3.240262e-01 
+    ## AccuracyPValue  McnemarPValue 
+    ##   3.197132e-07            NaN
+
+***\[TODO\]*** opisac cos o tym
+
+Porównanie modeli
+-----------------
+
+Na koniec modele zostały porównane na podstawie miary średniej
+kwadratowej błędów RMSE (w przypadku tej miary, im mniejszą wartość
+osiągnie algorytm, tym jest lepszy) i współczynnik determinacji
+R<sup>2</sup> (dopsowanie modelu jest tym lepsze im wartość
+R<sup>2</sup> jest bliższa jedności):
+
+    x <- list(randomForest = fitRandomForestF, linearRegression = fitLR, kNN = fitKNN) %>% resamples()
+
+    dotplot(x, metric = "RMSE")
+
+![](README_files/figure-markdown_strict/unnamed-chunk-26-1.png)
+
+    dotplot(x, metric = "Rsquared")
+
+![](README_files/figure-markdown_strict/unnamed-chunk-26-2.png)
 
 Analiza ważnośći atrybutów najlepszego znalezionego modelu regresji
 ===================================================================
@@ -464,3 +835,11 @@ Analiza ważnośći atrybutów najlepszego znalezionego modelu regresji
 modelu regresji. Analiza ważności atrybutów powinna stanowić próbę
 odpowiedzi na pytanie: co sprawia, że rozmiar śledzi zaczął w pewnym
 momencie maleć.
+
+Najlepszym znalezionym modelem regresji okazał się być algorytm kNN, dla
+którego przeanalizowaliśmy ważność atrybutów:
+
+    ggplot(varImp(fitKNN))
+
+![](README_files/figure-markdown_strict/unnamed-chunk-27-1.png)
+***\[TODO\]*** opisac
