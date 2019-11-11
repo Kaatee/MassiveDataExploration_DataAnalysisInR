@@ -22,7 +22,9 @@ Do analizy danych i stworzenia raportu z tej analizy zostały wykorzystane nast�
 - dplyr  
 - gridExtra  
 - gifski package
-- imputeTS
+- imputeTS  
+- caret
+
 
 # Zapewnienie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych
 Aby zapewnić powtarzalność próbkowań i losowań liczb (m. inn. przy próbkowaniu zbioru) przy każdym odpaleniu programu ustawiono stałe ziarno.  
@@ -81,7 +83,7 @@ head(data)
 sapply(data, class)
 
 ```
-***[TODO]*** może to jakoś ładniej zrobić "as.numeric" a nie tak brzydko powtarzając kod
+***[TODO]*** może to jakoś ładniej zrobić jakimś forem "as.numeric" a nie tak brzydko powtarzając kod
 
 # Rozmiar zbioru danych i podstawowe statystyki
 ```{r}
@@ -117,7 +119,7 @@ data$lcop1 <- na_kalman(data$lcop1)
 data$lcop2 <- na_kalman(data$lcop2)
 data$sst <- na_kalman(data$sst)
 ```
-
+***[TODO]*** może też jakiś for , aczkolwiek Bartek tak ma więc może to nie jest aż takie brzydkie
 Ilosć brakujących danych w poszczególnych kolumnach po zastosowaniu filtru Kalman'a:
 
 ```{r}
@@ -162,7 +164,7 @@ Analizując długość śledzia (*length*) można zauważyć, że ten atrybut pr
 Jeśli chodzi o atrybut jakim jest dostępność planktonu (zarówno zagęszczenie *Calanus finmarchicus gat. 1* jak i *Calanus finmarchicus gat. 2*) to można zauważyć że w zbiorze znalazło się znacznie więcej danych z łowisk o mniejszej dostępności planktonu omawianego gatunku. Minimalna dostępność pierwszego gatunku tego planktonu to 0, maksymalna: ok 37,67. Srednia to ok. 0,45 a mediana to ok. 0,11. Jeśli chodzi o drugi gatunek planktonu *Calanus finmarchicus* to jego minimalne zagęszczenie wynosi 0, maksymalne - ok. 19,4, średnia to ok. 2,03 a mediana - 0.7.  
 
 ***[TODO]*** Opisać reszte  
-***[TODO]*** Moze cos z odstającymi danymi - najlepiej zapytac na zajeciach
+***[TODO]*** Moze cos z odstającymi danymi, ogarnąć czy jest sens
 
 # Korelacja między zmiennymi
 
@@ -176,7 +178,7 @@ Niski ujemny współczynnik korelacji wskazujący na wysoką korelacje atrybutó
 
 Jeśli chodzi o atrybut, którego będą dotyczyć badania w dalszej części pracy, czyli ługość śledzia, to jest najbardziej skorelowana z temperaturą przy powierzchni wody, a współczynnik tej korelacji wynosi -0.45 (czyli są to wartości odwrotnie zależne)
 
-***[TODO]*** Zmniejszyć tekst w srodku zeby bylo widac  
+***[TODO]*** Zmniejszyć tekst w srodku zeby bylo widac  jeśli się da, jeśli dłużej niż 10min to olać :P
 
 ```{r cache=TRUE}
 res <- cor(data)
@@ -239,12 +241,118 @@ p + transition_reveal(X)
 
 Z wykresu można zauważyć delikatny spadek śledzia w czasie. Choć na początku rozmiar śledzia znaczie rośnie, to po którkim czasie zaczyna już maleć.
 
-***[TODO]*** pobawic sie w pogrupowanie tych miesiecy w pory roku zeby nie bylo tak brzydko na wykresie
-
 # Przewidywanie rozmiaru śledzia
 W niniejszej sekcji zostanie podjęta próba stworzenia regresora przewidującego rozmiar śledzia.  
 ***[TODO]*** ogarnąć te regresory    
 ***[TODO]*** Sekcję próbującą stworzyć regresor przewidujący rozmiar śledzia (w tej sekcji należy wykorzystać wiedzę z pozostałych punktów oraz wykonać dodatkowe czynności, które mogą poprawić trafność predykcji); dobór parametrów modelu oraz oszacowanie jego skuteczności powinny zostać wykonane za pomocą techniki podziału zbioru na dane uczące, walidujące i testowe; trafność regresji powinna zostać oszacowana na podstawie miar R2 i RMSE
 
+W niniejszym rozdziale postaramy się przewidzieć rozmiar śledzia z wykorzystaniem różnych metod uczenia maszynowego. W tym celu na początek dane zostaną podzielone na zbiór uczący (stanowiący 75% całego zbioru danych) i testowy (stanowiący 25% całego zbioru danych). 
+
+Parametry zostały domyślnie zoptymalizowane wybierając trzy wartości dla każdego zdefiniowanego dla modelu parametru optymalizacyjnego.  
+
+Do badań zostanie wykorzystana powtarzana ocena krzyżowa.
+```{r}
+library(caret)
+library(ggplot2)
+library(gganimate)
+library(dplyr)
+
+data2 <- sample_n(data,  1000)
+inTraining <- createDataPartition(y = data2$length, p = .75,list = FALSE)
+
+training <- data2[ inTraining, ]
+testing  <- data2[-inTraining, ]
+
+ctrl <- trainControl( method = "repeatedcv", number = 5, repeats = 10)
+```
+
+Pierwszym z wykorzystanych algorytmów będzie Random Forest z liczbą drzew w lesie równą 10.
+
+```{r cache=TRUE}
+fitRandomForestF <- train(length ~ ., data = training, method = "rf", importance=T, trControl = ctrl, ntree = 10) #rf
+fitRandomForestF
+
+rfClasses <- predict(fitRandomForestF, newdata = testing)
+rfClasses <- sapply(rfClasses, round, digits = 0)
+
+availableValues <- sapply(testing$length, round, digits = 0)
+levels <- unique(c(availableValues, rfClasses))
+
+confusionMatrix <- confusionMatrix(data = factor(rfClasses, levels = levels),   factor(availableValues, levels = levels))
+confusionMatrix
+```
+
+```{r}
+confusionMatrix$overall
+```
+
+***[TODO]*** zrobić żeby był ładniej ten wykres a nietakie powtarzane te parametry  
+
+Kolejnym przebadanym regresorem będzie regresja liniowa 
+
+```{r cache=TRUE, warning = FALSE}
+fitLR <- train(length ~ ., data = training, method = "lm", importance=T, trControl = ctrl)
+fitLR
+
+lrClasses <- predict(fitLR, newdata = testing)
+lrClasses <- sapply(lrClasses, round, digits = 0)
+
+availableValues <- sapply(testing$length, round, digits = 0)
+levels <- unique(c(availableValues, lrClasses))
+
+confusionMatrix <- confusionMatrix(data = factor(lrClasses, levels = levels),   factor(availableValues, levels = levels))
+confusionMatrix
+```
+
+```{r}
+confusionMatrix$overall
+```
+
+***[TODO]*** zrobić żeby był ładniej ten wykres a nietakie powtarzane te parametry  
+
+Ostatnim z przebadanych algorytmów został kNN  
+```{r cache=TRUE, warning = FALSE}
+fitKNN <- train(length ~ ., data = training, method = "knn", importance=T, trControl = ctrl)
+fitKNN
+
+knnClasses <- predict(fitKNN, newdata = testing)
+knnClasses <- sapply(knnClasses, round, digits = 0)
+
+availableValues <- sapply(testing$length, round, digits = 0)
+levels <- unique(c(availableValues, knnClasses))
+
+confusionMatrix <- confusionMatrix(data = factor(knnClasses, levels = levels),   factor(availableValues, levels = levels))
+confusionMatrix
+```
+
+```{r}
+plot(fitKNN)
+confusionMatrix$overall
+```
+
+Na koniec modele zostały porównane na podstawie miary RMSE (w przypadku tej miary, im mniejszą wartość osiągnie algorytm, tym jest lepszy) i R^2:  
+***[TODO]*** Poczytać o R^2 i napisac cos o tym czy lepsze jak jest wieksze czy jak  
+***[TODO]*** Zrobic zeby  R^2 ładnie sie pisało z ym 2 na górze
+
+```{r}
+x <- list(randomForest = fitRandomForestF, linearRegression = fitLR, kNN = fitKNN) %>% resamples()
+
+dotplot(x, metric = "RMSE")
+dotplot(x, metric = "Rsquared")
+```
+
 # Analiza ważnośći atrybutów najlepszego znalezionego modelu regresji  
-***[TODO]*** Analiza ważności atrybutów najlepszego znalezionego modelu regresji. Analiza ważności atrybutów powinna stanowić próbę odpowiedzi na pytanie: co sprawia, że rozmiar śledzi zaczął w pewnym momencie maleć.
+***[TODO]*** Analiza ważności atrybutów najlepszego znalezionego modelu regresji. Analiza ważności atrybutów powinna stanowić próbę odpowiedzi na pytanie: co sprawia, że rozmiar śledzi zaczął w pewnym momencie maleć.  
+
+***[TODO]*** TODO - jak już puścimy i sie nauczy to zobaczyc które z tych ogarnąć i opisać
+
+
+```{r}
+
+
+ggplot(varImp(fitRandomForestF))
+
+ggplot(varImp(fitLR))
+ggplot(varImp(fitKNN))
+
+```
