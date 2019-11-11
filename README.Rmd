@@ -257,11 +257,10 @@ library(ggplot2)
 library(gganimate)
 library(dplyr)
 
-data2 <- sample_n(data,  1000)
-inTraining <- createDataPartition(y = data2$length, p = .75,list = FALSE)
+inTraining <- createDataPartition(y = data$length, p = .75,list = FALSE)
 
-training <- data2[ inTraining, ]
-testing  <- data2[-inTraining, ]
+training <- data[ inTraining, ]
+testing  <- data[-inTraining, ]
 
 ctrl <- trainControl( method = "repeatedcv", number = 5, repeats = 10)
 ```

@@ -4,3 +4,7 @@ ggExtra
 gridExtra
 corrplot
 imputeTS
+gganimate
+dplyr
+lattice
+caret
