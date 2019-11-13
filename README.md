@@ -887,6 +887,7 @@ którego przeanalizowaliśmy ważność atrybutów:
 
     ggplot(varImp(fitKNN))
 
-![](README_files/figure-markdown_strict/unnamed-chunk-28-1.png) Z
-powyższego wykresu wynika, że największy wpływ na długość śledzia miał
+![](README_files/figure-markdown_strict/unnamed-chunk-28-1.png)
+
+Z powyższego wykresu wynika, że największy wpływ na długość śledzia miał
 atrybut *sst* czyli temperatura przy powierzchni wody.

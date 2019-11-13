@@ -361,4 +361,5 @@ Najlepszym znalezionym modelem regresji okazał się być algorytm kNN, dla któ
 ```{r}
 ggplot(varImp(fitKNN))
 ```
-Z powyższego wykresu wynika, że największy wpływ na długość śledzia miał atrybut *sst* czyli temperatura przy powierzchni wody.
+
+  Z powyższego wykresu wynika, że największy wpływ na długość śledzia miał atrybut *sst* czyli temperatura przy powierzchni wody.
