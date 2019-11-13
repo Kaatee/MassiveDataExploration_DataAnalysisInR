@@ -14,7 +14,7 @@ data wygenerowania: '`r format(Sys.Date(), "%Y-%B-%d")`'
 ***[TODO]*** podsumowanie calego raportu
 
 # Wykorzystane biblioteki
-Do analizy danych i stworzenia raportu z tej analizy zostały wykorzystane następujące biblioteki: 
+Do analizy danych i stworzenia raportu z tej analizy zostały wykorzystane następujące biblioteki:   
 - datasets    
 - corrplot  
 - ggplot2  
@@ -132,21 +132,21 @@ Z powyższej tabeli wynika, że filtr Kalman'a poradził sobie ze wszystkimi bra
 # Szczegółowa analiza zbiorów wartości
 Poniżej przedstawiono rozkłady wszystkich wartości w zbiorze danych  
 
-```{r cache=TRUE, warning = FALSE, message = FALSE}
+```{r message=FALSE, warning=FALSE}
 library(ggplot2)
 library(ggExtra)
 
 lengthDissPlot <- ggplot(data, aes(x=length)) + geom_histogram(binwidth=.5, colour="black", fill="white")
 cfin1DissPlot <- ggplot(data, aes(x=cfin1)) + geom_histogram(binwidth=1, colour="black", fill="white")
 cfin2DissPlot <- ggplot(data, aes(x=cfin2)) + geom_histogram(binwidth=1, colour="black", fill="white")
-chel1DissPlot <- ggplot(data, aes(x=chel1)) + geom_histogram(binwidth=.5, colour="black", fill="white")
-chel2DissPlot <- ggplot(data, aes(x=chel2)) + geom_histogram(binwidth=.5, colour="black", fill="white")
-lcop1DissPlot <- ggplot(data, aes(x=lcop1)) + geom_histogram(binwidth=.5, colour="black", fill="white")
-lcop2DissPlot <- ggplot(data, aes(x=lcop2)) + geom_histogram(binwidth=.5, colour="black", fill="white")
+chel1DissPlot <- ggplot(data, aes(x=chel1)) + geom_histogram(binwidth=2, colour="black", fill="white")
+chel2DissPlot <- ggplot(data, aes(x=chel2)) + geom_histogram(binwidth=2, colour="black", fill="white")
+lcop1DissPlot <- ggplot(data, aes(x=lcop1)) + geom_histogram(binwidth=5, colour="black", fill="white")
+lcop2DissPlot <- ggplot(data, aes(x=lcop2)) + geom_histogram(binwidth=3, colour="black", fill="white")
 fbarDissPlot <- ggplot(data, aes(x=fbar)) + geom_histogram(binwidth=.05, colour="black", fill="white")
 recrDissPlot <- ggplot(data, aes(x=recr)) + geom_histogram(binwidth=50000.0, colour="black", fill="white")
 cumfDissPlot <- ggplot(data, aes(x=cumf)) + geom_histogram(binwidth=.02, colour="black", fill="white")
-totalnDissPlot <- ggplot(data, aes(x=totaln)) + geom_histogram(binwidth=1000.0, colour="black", fill="white")
+totalnDissPlot <- ggplot(data, aes(x=totaln)) + geom_histogram(binwidth=10000.0, colour="black", fill="white")
 sstDissPlot <- ggplot(data, aes(x=sst)) + geom_histogram(binwidth=.2, colour="black", fill="white")
 salDissPlot <- ggplot(data, aes(x=sal)) + geom_histogram(binwidth=.01, colour="black", fill="white")
 xmonthDissPlot <- ggplot(data, aes(x=xmonth)) + geom_histogram(binwidth=1.0, colour="black", fill="white")
@@ -176,9 +176,7 @@ Rozkład atrybutu *cumf*, czyli łączne roczne natężenie połowów w regionie
 
 Z wykresu zawierającego rozkład wartości atrybutu *totaln*, czyli łącznej liczby ryb złowionych w ramach połowu (liczbę śledzi) wynika, że liczba łowionych ryb była nierównomierna. Można zauważyć tylko, że bardzo dużą liczbę przykładów w zbiorze danych pokrywają połowy, w trakcie których złowiono ok 750tys. śledzi. Ze wcześniejszych badań wynika, że minimalna liczba śledzi złowionych w trakcie połowu to ok. 144 tysiące, maksymalna - ok 1 milion, średnia - ok. 514tys., a mediana to ok 540tys.
 
-* sst: temperatura przy powierzchni wody [°C];   
-
-***[TODO] z nowymi wykresami ***
+Kolejnym analizowanym atrybutem jest *sst*  - temperatura przy powierzchni wody [°C]. Z wykresu można zauważyć, że najwięcej przykładów ze zbioru danych przyjmuje wartość tego atrybutu z przedziału 13.5 - 14.5. Minimalna wartość *sst* wynosi 12.77, maksymalna: 14.73, średnia 13.87, a mediana 13.86. 
 
 Jeśli chodzi o atrybut *sal*: poziom zasolenia wody [Knudsen ppt] to zdecydowana większość przypadków w zbiorze danych przyjmowała jego wartość w przedziale 35.50 - 35.55 . Minimalna wartość tego atrybutu w całym zbiorze wyniosła 35.40, maksymalna: 35.61 a mediana i średnia: 35.51.  
 
@@ -204,7 +202,7 @@ Bardzo niski, jednak ujemny współczynnik korelacji (wynoszący -0.55) miedzy a
 
 Niski ujemny współczynnik korelacji wskazujący na wysoką korelacje atrybutów można też zauważyć między *cumf* (łączne roczne natężenie połowów w regionie) a *totaln* (łączna liczba ryb złowionych w ramach połowu) - wynosi on -0.71, gdzie taka zależność też jest naturalna.  
 
-Jeśli chodzi o atrybut, którego będą dotyczyć badania w dalszej części pracy, czyli ługość śledzia, to jest najbardziej skorelowana z temperaturą przy powierzchni wody, a współczynnik tej korelacji wynosi -0.45 (czyli są to wartości odwrotnie zależne)
+Jeśli chodzi o atrybut, którego będą dotyczyć badania w dalszej części pracy, czyli długość śledzia, to jest najbardziej skorelowana z temperaturą przy powierzchni wody, a współczynnik tej korelacji wynosi -0.45 (czyli są to wartości odwrotnie zależne)
 
 
 Żeby lepiej zwizualizować korelacje między omówionymi atrybutami przedstawiono wykresy zależności tych atrybutów.
@@ -301,7 +299,6 @@ confusionMatrix
 confusionMatrix$overall
 ```
 
-***[TODO]*** opisac cos o tym
 
 ## Regresja liniowa
 Kolejnym przebadanym regresorem będzie regresja liniowa 
@@ -324,7 +321,6 @@ confusionMatrix
 confusionMatrix$overall
 ```
 
-***[TODO]*** opisac cos o tym
 
 ## kNN
 Ostatnim z przebadanych algorytmów został kNN  
@@ -346,8 +342,7 @@ confusionMatrix
 plot(fitKNN)
 confusionMatrix$overall
 ```
-
-***[TODO]*** opisac cos o tym  
+Z wykresu wynika, że algotyrm osiąga najlepsze wyniki (czyli najmniejszą miarę RMSE) dla k=5.
 
 ## Porównanie modeli
 Na koniec modele zostały porównane na podstawie miary średniej kwadratowej błędów RMSE (w przypadku tej miary, im mniejszą wartość osiągnie algorytm, tym jest lepszy) i współczynnik determinacji R^2^ (dopsowanie modelu jest tym lepsze im wartość R^2^ jest bliższa jedności):  
@@ -358,16 +353,12 @@ x <- list(randomForest = fitRandomForestF, linearRegression = fitLR, kNN = fitKN
 dotplot(x, metric = "RMSE")
 dotplot(x, metric = "Rsquared")
 ```
+Z powyższych wykresów wynika że w przypadku porównywania algorytmu obiema miarami najlepiej poradził sobie algorytm kNN.  
 
 # Analiza ważnośći atrybutów najlepszego znalezionego modelu regresji  
-***[TODO]*** Analiza ważności atrybutów najlepszego znalezionego modelu regresji. Analiza ważności atrybutów powinna stanowić próbę odpowiedzi na pytanie: co sprawia, że rozmiar śledzi zaczął w pewnym momencie maleć.   
-***[TODO]*** sprawdzic czy po wywaleniu x nadal knn
-
 Najlepszym znalezionym modelem regresji okazał się być algorytm kNN, dla którego przeanalizowaliśmy ważność atrybutów:
 
 ```{r}
 ggplot(varImp(fitKNN))
-ggplot(varImp(fitRandomForestF))
-ggplot(varImp(fitLR))
 ```
-***[TODO]*** opisac najlepszy i sprawdzic czy to knn tak jak w piosie nad kodem
+Z powyższego wykresu wynika, że największy wpływ na długość śledzia miał atrybut *sst* czyli temperatura przy powierzchni wody.
